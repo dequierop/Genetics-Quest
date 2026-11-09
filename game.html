@@ -89,8 +89,11 @@
       main { width:100%;height:100svh;min-height:0;padding:0;align-items:center;justify-content:center; }
       header { position:fixed;z-index:5;top:calc(5px + env(safe-area-inset-top));right:10px;margin:0; }
       .brand { display:none; }
-      .hud { position:fixed;z-index:5;top:calc(6px + env(safe-area-inset-top));left:10px;right:10px;margin:0;align-items:flex-start;pointer-events:none; }
-      .hud .stats { pointer-events:auto; }
+      .hud { position:fixed;z-index:5;top:calc(48px + env(safe-area-inset-top));left:8px;right:8px;margin:0;justify-content:center;align-items:center;pointer-events:none; }
+      .level-label { display:none; }
+      .hud .stats { justify-content:center;max-width:100%;gap:4px;pointer-events:auto; }
+      .hud .stat { padding:4px 7px;font-size:10px; }
+      .hud .stat:first-child { max-width:125px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
       .game-frame { flex:none;width:min(100vw,177.78svh);height:min(100svh,56.25vw);border-radius:10px; }
       canvas { width:100%;height:100%;aspect-ratio:auto; }
       .hintbar,.credit { display:none; }
