@@ -10,7 +10,7 @@
     :root { --ink:#17313c; --cream:#fff9e9; --lime:#c8f36b; --aqua:#83e7e2; --pink:#ff84ad; }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; color:var(--cream); font-family:Mali,"Noto Sans Thai",sans-serif; background:#122934; overflow:hidden; }
-    .scene { position:fixed; inset:0; background:linear-gradient(90deg,rgba(5,25,35,.72),rgba(8,29,37,.48) 50%,rgba(6,22,30,.46)),url('./ฉากเกมผจญภัยชีววิทยา-ไม่มีตัวละคร.png') center/cover no-repeat; transform:scale(1.025); filter:saturate(.9); }
+    .scene { position:fixed; inset:0; background:linear-gradient(90deg,rgba(5,25,35,.72),rgba(8,29,37,.48) 50%,rgba(6,22,30,.46)),url('assets/home-bg.png') center/cover no-repeat; transform:scale(1.025); filter:saturate(.9); }
     .scene::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(8,25,32,.45),transparent 37%,rgba(8,25,32,.15)); }
     .grain { position:fixed; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(#fff 0.6px,transparent .7px); background-size:5px 5px; mix-blend-mode:soft-light; }
     main { position:relative; min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; padding:28px clamp(20px,5vw,76px) 22px; }
@@ -121,10 +121,10 @@
       <div class="art" aria-label="เลือกตัวละครนักผจญภัย">
         <div class="orb"></div><div class="dna" aria-hidden="true">🧬</div>
         <span class="float-tag">เลือกนักผจญภัยของคุณ</span><span class="spark s1">✦</span><span class="spark s2">✧</span>
-        <div class="character-showcase"><img id="selectedAvatar" src="./ตัวละครผู้หญิง-เลือก.png" alt="ตัวละครผู้หญิงยืน" /><span class="character-name" id="characterName">ไบโอบี — นักสำรวจสาว</span></div>
+        <div class="character-showcase"><img id="selectedAvatar" src="assets/hero-girl.png" alt="ตัวละครผู้หญิงยืน" /><span class="character-name" id="characterName">ไบโอบี — นักสำรวจสาว</span></div>
         <div class="choice-wrap"><p class="choice-title">เลือกตัวละคร</p><div class="choice-row">
-          <button class="choice" type="button" data-character="girl" aria-pressed="true"><img src="./ตัวละครผู้หญิง-เลือก.png" alt="" />ไบโอบี</button>
-          <button class="choice" type="button" data-character="boy" aria-pressed="false"><img src="./ตัวละครผู้ชาย-เลือก.png" alt="" />ยีน</button>
+          <button class="choice" type="button" data-character="girl" aria-pressed="true"><img src="assets/hero-girl.png" alt="" />ไบโอบี</button>
+          <button class="choice" type="button" data-character="boy" aria-pressed="false"><img src="assets/hero-boy.png" alt="" />ยีน</button>
         </div></div>
       </div>
     </section>
@@ -158,13 +158,13 @@
       selectedCharacter=boy?'ยีน — นักสำรวจหนุ่ม':'ไบโอบี — นักสำรวจสาว';
       localStorage.setItem('playerCharacter',boy?'boy':'girl');
       const avatar=document.getElementById('selectedAvatar');
-      avatar.src=boy?'./ตัวละครผู้ชาย-เลือก.png':'./ตัวละครผู้หญิง-เลือก.png';
+      avatar.src=boy?'assets/hero-boy.png':'assets/hero-girl.png';
       avatar.alt=boy?'ตัวละครผู้ชายยืน':'ตัวละครผู้หญิงยืน';
       document.getElementById('characterName').textContent=selectedCharacter;
       document.querySelectorAll('.choice').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
     }));
     form.addEventListener('submit',e=>{ e.preventDefault(); clickSound(); const name=nameInput.value.trim(); if(!name){hint.textContent='ใส่ชื่อก่อนเริ่มการผจญภัยนะ';nameInput.focus();form.classList.remove('shake');void form.offsetWidth;form.classList.add('shake');return;} localStorage.setItem('playerName',name);document.getElementById('welcomeText').textContent=`${name} และ ${selectedCharacter} พร้อมแล้ว! เตรียมออกตามหา DNA และพิชิตคำศัพท์พันธุศาสตร์กัน`;modal.classList.add('open');document.getElementById('closeWelcome').focus(); });
-    document.getElementById('closeWelcome').addEventListener('click',()=>{window.location.href='เลือกด่านเกมคำศัพท์พันธุศาสตร์.html';});
+    document.getElementById('closeWelcome').addEventListener('click',()=>{window.location.href='levels.html';});
     modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
   </script>
 </body>

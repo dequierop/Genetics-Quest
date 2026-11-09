@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#142c37" />
+  <title>เล่นเกม — Genetics Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
+    :root { --cream:#fff9e9; --ink:#17313c; --lime:#c8f36b; --aqua:#83e7e2; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--cream); background:radial-gradient(ellipse at 50% 0%,#244d4d,#102832 65%); font-family:Mali,"Noto Sans Thai",sans-serif; }
+    main { width:min(1120px,100%); min-height:100vh; margin:auto; padding:18px clamp(14px,3vw,32px) 20px; display:flex; flex-direction:column; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:14px; margin-bottom:13px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.04em; font-size:14px; }
+    .mark { display:grid; place-items:center; width:40px;height:40px;border-radius:14px;background:var(--lime);color:var(--ink);font-size:21px; }
+    .brand small { display:block; font-size:10px; color:#cfe1d8; line-height:1.1; }
+    a.back { color:white; text-decoration:none; border:1px solid #ffffff5c; background:#17333ed9; padding:8px 13px; border-radius:999px; font-size:12px; }
+    .hud { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+    .level-label { font-size:clamp(17px,2.5vw,24px); font-weight:700; }
+    .stats { display:flex; gap:8px; flex-wrap:wrap; }
+    .stat { padding:7px 13px; background:#173742d9; border:1px solid #d9f5ce42; border-radius:13px; color:#eff5df; font-size:13px; }
+    .game-frame { position:relative; overflow:hidden; border-radius:20px; border:2px solid #d9f5ce60; box-shadow:0 20px 55px #061820a8; background:#193b3c; }
+    canvas { display:block; width:100%; height:auto; aspect-ratio:16 / 9; touch-action:none; }
+    .hintbar { display:flex; justify-content:space-between; align-items:center; gap:15px; padding:10px 2px 0; color:#d1e4d9; font-size:12px; }
+    .hintbar strong { color:var(--lime); font-weight:600; }
+    .credit { margin-top:auto; padding-top:14px; text-align:center; color:#d1e4d9; font-size:11px; opacity:.82; }
+    .touch-controls { position:absolute;z-index:3;inset:auto 0 0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 3.2% 4.5%;touch-action:none;user-select:none;pointer-events:none; }
+    .pad-group { display:flex;align-items:center;gap:12px;pointer-events:auto; }
+    .pad { width:clamp(54px,7vw,76px);height:clamp(54px,7vw,76px);border:2px solid #e8fff1a8;border-radius:50%;background:#143541c9;color:#fff;font:700 24px Mali,sans-serif;box-shadow:0 5px 12px #061820a8,inset 0 0 12px #ffffff18;backdrop-filter:blur(4px);touch-action:none; }
+    .pad.jump { width:clamp(66px,8vw,88px);height:clamp(66px,8vw,88px);background:#c8f36be8;color:#19333b;font-size:13px;box-shadow:0 5px 14px #061820a8,inset 0 0 12px #ffffff45; }
+    .pad.shoot { width:clamp(60px,7.5vw,82px);height:clamp(60px,7.5vw,82px);background:#83e7e2e8;color:#19333b;font-size:13px;box-shadow:0 5px 14px #061820a8,inset 0 0 12px #ffffff45; }
+    .pad:active { transform:scale(.93);filter:brightness(1.15); }
+    .overlay { position:fixed; z-index:10; inset:0; display:none; place-items:center; padding:18px; background:#071b25c9; backdrop-filter:blur(9px); }
+    .overlay.open { display:grid; animation:fade .2s ease; }
+    .question-card { width:min(580px,100%); padding:26px; border-radius:24px; background:var(--cream); color:var(--ink); box-shadow:0 25px 90px #0008; animation:pop .25s ease; }
+    .q-top { display:flex;justify-content:space-between;align-items:center;gap:12px; }
+    .q-badge { color:#285346;background:#dff5bc;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700; }
+    .q-count { color:#778c80;font-size:12px; }
+    .question-card h2 { margin:12px 0 6px;font-size:clamp(19px,3vw,25px);line-height:1.45; }
+    .q-sub { margin:0 0 15px;color:#63756d;font-size:13px; }
+    .shop-line { display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin:0 0 13px; }
+    .buy-hint { border:1px solid #dfbb55; border-radius:11px; padding:7px 11px; color:#654b17; background:#fff1bd; font:600 12px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; }
+    .buy-hint:disabled { opacity:.55; cursor:default; }
+    .hint-text { color:#496959; font-size:12px; font-weight:600; }
+    .answers { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+    .answer { min-height:52px;text-align:left;padding:10px 13px;border:2px solid #dce7d3;border-radius:13px;background:#fff;color:#244048;font:500 14px Mali,"Noto Sans Thai",sans-serif;cursor:pointer;transition:.16s; }
+    .answer:hover { border-color:#9acb51; background:#f8ffe9; transform:translateY(-1px); }
+    .answer.correct { border-color:#58ac68;background:#e5f6e8; }
+    .answer.wrong { border-color:#e68f83;background:#fff0ec; }
+    .feedback { min-height:25px;margin:10px 0 0;font-size:13px;font-weight:600;color:#a34c3f; }
+    .feedback.good { color:#347b4b; }
+    .q-next { display:none;margin-top:5px;border:0;border-radius:12px;background:var(--lime);padding:10px 18px;color:var(--ink);font:700 14px Mali,sans-serif;cursor:pointer; }
+    .q-next.show { display:inline-block; }
+    .finish-card { text-align:center;width:min(480px,100%);padding:30px;border-radius:25px;background:var(--cream);color:var(--ink);box-shadow:0 25px 90px #0008; }
+    .finish-card .big { font-size:54px; }
+    .finish-card h2 { margin:0 0 8px; }
+    .finish-card p { color:#60766e; }
+    .finish-actions { display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px; }
+    .finish-actions a,.finish-actions button { border:0;border-radius:12px;padding:10px 15px;background:var(--lime);color:var(--ink);font:700 13px Mali,sans-serif;text-decoration:none;cursor:pointer; }
+    .finish-actions a.secondary { background:#e5eee2; }
+    @keyframes fade { from {opacity:0} to {opacity:1} }
+    @keyframes pop { from {opacity:0;transform:translateY(12px) scale(.98)} to {opacity:1;transform:none} }
+    @media(max-width:650px) {
+      main { min-height:100svh; padding-bottom:calc(12px + env(safe-area-inset-bottom)); }
+      header { margin-bottom:9px; }
+      .game-frame { border-radius:14px; }
+      .hintbar { font-size:10px; }
+      .answers { grid-template-columns:1fr; gap:8px; }
+      .question-card { padding:20px; max-height:90svh; overflow:auto; }
+      .answer { min-height:46px; }
+      .stat { font-size:11px;padding:6px 9px; }
+    }
+    @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand"><span class="mark">🧬</span><span>GENETICS QUEST<small>คำศัพท์พันธุศาสตร์ ม.4</small></span></div>
+      <a class="back" href="levels.html">← เลือกด่าน</a>
+    </header>
+    <section class="hud">
+      <div class="level-label" id="levelTitle">ด่าน 1 · ป่ารหัส DNA</div>
+      <div class="stats"><span class="stat" id="playerLabel">นักสำรวจ</span><span class="stat" id="heartCount" aria-label="หัวใจ 3 ดวง">❤️❤️❤️</span><span class="stat">🧬 <b id="itemCount">0 / 10</b></span><span class="stat">🪙 <b id="moneyCount">0</b></span></div>
+    </section>
+    <div class="game-frame"><canvas id="game" width="960" height="540" aria-label="สนามเล่นเกมด้านข้าง"></canvas>
+      <div class="touch-controls" aria-label="ปุ่มควบคุมบนจอ">
+        <div class="pad-group"><button class="pad" data-key="left" aria-label="เดินซ้าย">◀</button><button class="pad" data-key="right" aria-label="เดินขวา">▶</button></div>
+        <div class="pad-group"><button class="pad shoot" data-key="shoot">ยิง ✦</button><button class="pad jump" data-key="jump">กระโดด ⤴</button></div>
+      </div>
+    </div>
+    <div class="hintbar"><span><strong>บังคับ:</strong> ← → เดินสลับเท้า · Space กระโดด · X ยิง</span><span>ยิงมอนสเตอร์รับเหรียญ · ซื้อคำใบ้ 3 เหรียญ</span></div>
+    <footer class="credit">พัฒนาโดย ครูภัทรกันย์ กิติยศ</footer>
+  </main>
+  <div class="overlay" id="questionOverlay" role="dialog" aria-modal="true" aria-labelledby="questionText">
+    <div class="question-card"><div class="q-top"><span class="q-badge" id="qStage">ด่าน 1 · คำศัพท์</span><span class="q-count" id="qCount">ไอเทม 1 / 10</span></div><h2 id="questionText"></h2><p class="q-sub">เลือกคำตอบที่ถูกต้องเพื่อเก็บไอเทมชิ้นนี้</p><div class="shop-line"><button class="buy-hint" id="buyHint">🪙 ซื้อคำใบ้ · 3 เหรียญ</button><span class="hint-text" id="hintText"></span></div><div class="answers" id="answers"></div><div class="feedback" id="feedback" aria-live="polite"></div><button class="q-next" id="continueBtn">เก็บไอเทมแล้ว ไปต่อ →</button></div>
+  </div>
+  <div class="overlay" id="finishOverlay" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
+    <div class="finish-card"><div class="big" id="finishIcon">🏆</div><h2 id="finishTitle">ผ่านด่านแล้ว!</h2><p id="finishText"></p><div class="finish-actions"><a href="levels.html">เลือกด่านอื่น</a><button id="replay">เล่นด่านนี้อีกครั้ง</button><a class="secondary" href="index.html">กลับหน้าแรก</a></div></div>
+  </div>
+  <script>
+    const questionBanks = [
+      [
+        {q:'ยีน (Gene) หมายถึงอะไร?',c:['ช่วงหนึ่งของ DNA ที่กำหนดลักษณะทางพันธุกรรม','ออร์แกเนลล์ที่สร้างพลังงาน','เอนไซม์ที่ย่อยโปรตีน','เยื่อหุ้มเซลล์'],a:0,e:'ยีนคือช่วงของ DNA ที่มีข้อมูลเกี่ยวข้องกับลักษณะทางพันธุกรรม'},
+        {q:'โครโมโซมประกอบขึ้นจากสิ่งใดเป็นหลัก?',c:['DNA และโปรตีน','RNA และไขมัน','น้ำตาลและแป้ง','กรดอะมิโนและน้ำ'],a:0,e:'โครโมโซมประกอบด้วย DNA พันรอบโปรตีน เช่น ฮิสโตน'},
+        {q:'Genome หมายถึงอะไร?',c:['สารพันธุกรรมทั้งหมดของสิ่งมีชีวิต','ยีนเพียงหนึ่งยีน','โปรตีนที่หุ้ม DNA','RNA ชนิดหนึ่ง'],a:0,e:'Genome คือสารพันธุกรรมทั้งหมดของสิ่งมีชีวิต'},
+        {q:'เบสคู่สมของ DNA จับคู่กันอย่างไร?',c:['A–T และ C–G','A–G และ C–T','A–C และ G–T','A–U และ C–G'],a:0,e:'ใน DNA เบส A จับกับ T และเบส C จับกับ G'},
+        {q:'DNA replication คือกระบวนการใด?',c:['การสร้าง DNA ชุดใหม่จาก DNA แม่แบบ','การสร้างโปรตีนจาก mRNA','การตัด intron ออกจาก RNA','การเปลี่ยนจำนวนโครโมโซม'],a:0,e:'DNA replication คือการจำลอง DNA เพื่อให้ได้ DNA ใหม่'},
+        {q:'การจำลอง DNA แบบกึ่งอนุรักษ์หมายความว่าอย่างไร?',c:['DNA ใหม่แต่ละโมเลกุลมีสายเดิมหนึ่งสายและสายใหม่หนึ่งสาย','DNA ใหม่มีแต่สายเดิม','DNA ใหม่มีแต่สายที่สร้างขึ้นใหม่','DNA ถูกสร้างจาก RNA เท่านั้น'],a:0,e:'แต่ละโมเลกุลใหม่ประกอบด้วยสายแม่แบบเดิมหนึ่งสายและสายที่สร้างใหม่หนึ่งสาย'},
+        {q:'DNA template ทำหน้าที่อะไร?',c:['เป็นแม่แบบสำหรับสร้างสาย DNA หรือ RNA','ย่อยโปรตีน','เชื่อมกรดอะมิโน','หยุดการจำลอง DNA'],a:0,e:'DNA template เป็นสายต้นแบบสำหรับการจำลอง DNA หรือการสร้าง RNA'},
+        {q:'Codon หนึ่งชุดประกอบด้วยนิวคลีโอไทด์กี่ตัว?',c:['1 ตัว','2 ตัว','3 ตัว','4 ตัว'],a:2,e:'Codon คือชุดนิวคลีโอไทด์ 3 ตัวบน mRNA'},
+        {q:'การจำลอง DNA เกิดขึ้นเด่นชัดในระยะใดของวัฏจักรเซลล์?',c:['ระยะ G1','ระยะ S','ระยะ G2','ระยะ M'],a:1,e:'เซลล์จำลอง DNA ในระยะ S ของ interphase'},
+        {q:'Plasmid มักมีลักษณะอย่างไร?',c:['DNA วงแหวนขนาดเล็กในแบคทีเรีย','โปรตีนหุ้มโครโมโซม','RNA ที่สร้างจากไรโบโซม','โครโมโซมคู่ที่ 21'],a:0,e:'พลาสมิดเป็น DNA วงแหวนที่พบได้ในแบคทีเรียบางชนิด'}
+      ],
+      [
+        {q:'เอนไซม์ Helicase ทำหน้าที่อะไรในการจำลอง DNA?',c:['คลายเกลียวและแยกสาย DNA','เชื่อมชิ้นส่วน DNA','สร้างกรดอะมิโน','ตัดโปรตีน'],a:0,e:'Helicase คลายเกลียว DNA เพื่อให้สายแม่แบบแยกออกจากกัน'},
+        {q:'Primase ทำหน้าที่สร้างอะไร?',c:['RNA primer','สายโปรตีน','โครโมโซมใหม่','รหัสหยุด'],a:0,e:'Primase สร้าง RNA primer เพื่อเป็นจุดเริ่มต้นให้ DNA polymerase'},
+        {q:'DNA polymerase III มีหน้าที่หลักอย่างไรในแบคทีเรีย?',c:['สร้างสาย DNA ใหม่โดยใช้สายแม่แบบ','ตัด RNA ออกจาก mRNA','คลายเกลียว DNA','หยุดการแปลรหัส'],a:0,e:'DNA polymerase III เติมนิวคลีโอไทด์เพื่อสร้างสาย DNA ใหม่'},
+        {q:'DNA polymerase I ช่วยทำอะไรระหว่างการจำลอง DNA?',c:['นำ RNA primer ออกและเติม DNA แทน','แยกโครโมโซม','สร้างกรดอะมิโน','แปลรหัส mRNA'],a:0,e:'DNA polymerase I เอา RNA primer ออกและเติม DNA ในบริเวณนั้น'},
+        {q:'DNA ligase ทำหน้าที่อะไร?',c:['เชื่อมชิ้นส่วน DNA เข้าด้วยกัน','แยกสาย DNA','สร้าง RNA primer','จับคู่เบส A กับ U'],a:0,e:'DNA ligase เชื่อมรอยต่อของชิ้นส่วน DNA ให้เป็นสายต่อเนื่อง'},
+        {q:'Leading strand ถูกสร้างขึ้นอย่างไร?',c:['ต่อเนื่องไปตามทิศทางการจำลอง','เป็นชิ้นสั้น ๆ เท่านั้น','สร้างจาก RNA โดยตรง','สร้างหลังการแปลรหัส'],a:0,e:'Leading strand ถูกสังเคราะห์ต่อเนื่องไปในทิศทางเดียวกับ replication fork'},
+        {q:'Lagging strand มีลักษณะอย่างไร?',c:['สร้างเป็นชิ้นสั้น ๆ ไม่ต่อเนื่อง','สร้างต่อเนื่องเสมอ','เป็นสาย RNA','ไม่มีนิวคลีโอไทด์'],a:0,e:'Lagging strand สร้างเป็นชิ้น ๆ แล้วจึงเชื่อมต่อกัน'},
+        {q:'Okazaki fragment คืออะไร?',c:['ชิ้นส่วน DNA สั้น ๆ บน lagging strand','โปรตีนที่หุ้ม DNA','รหัสเริ่มต้นบน mRNA','เอนไซม์คลายเกลียว'],a:0,e:'Okazaki fragments คือชิ้น DNA สั้น ๆ ที่เกิดบน lagging strand'},
+        {q:'Transcription สร้างสิ่งใดจาก DNA?',c:['RNA เช่น mRNA','โปรตีนโดยตรง','โครโมโซมทั้งแท่ง','กรดไขมัน'],a:0,e:'Transcription คือการสร้าง RNA จากสาย DNA แม่แบบ'},
+        {q:'Translation เกิดขึ้นที่ใดและสร้างอะไร?',c:['ไรโบโซมสร้างสายพอลิเพปไทด์จาก mRNA','นิวเคลียสสร้าง DNA','เยื่อหุ้มเซลล์สร้าง RNA primer','ไมโทคอนเดรียแยกโครโมโซม'],a:0,e:'ไรโบโซมอ่าน mRNA แล้วประกอบกรดอะมิโนเป็นพอลิเพปไทด์'}
+      ],
+      [
+        {q:'Mutation หมายถึงอะไร?',c:['การเปลี่ยนแปลงของสารพันธุกรรม','การสร้างโปรตีนตามปกติ','การจำลอง DNA แบบกึ่งอนุรักษ์','การจับคู่เบสตามปกติ'],a:0,e:'Mutation คือการเปลี่ยนแปลงของสารพันธุกรรมที่อาจส่งผลต่อลักษณะ'},
+        {q:'Base-pair substitution คือการกลายพันธุ์แบบใด?',c:['การแทนที่คู่เบสหนึ่งด้วยอีกคู่เบสหนึ่ง','การเพิ่มโครโมโซมทั้งชุด','การขาดหายของโครโมโซมทั้งแท่ง','การตัด intron ออกจาก RNA'],a:0,e:'Substitution คือการแทนที่เบสหรือนิวคลีโอไทด์ตำแหน่งหนึ่ง'},
+        {q:'Insertion หมายถึงอะไร?',c:['การเพิ่มนิวคลีโอไทด์เข้าไปในลำดับ DNA','การลบนิวคลีโอไทด์ออก','การกลับทิศของโครโมโซม','การเพิ่มโปรตีนฮิสโตน'],a:0,e:'Insertion คือการเพิ่มนิวคลีโอไทด์เข้าไปในสารพันธุกรรม'},
+        {q:'Deletion ในระดับยีนหมายถึงอะไร?',c:['การขาดหายของนิวคลีโอไทด์บางตำแหน่ง','การเพิ่มเบสเข้าไป','การสลับตำแหน่งยีน','การสร้าง mRNA'],a:0,e:'Deletion คือการสูญหายของนิวคลีโอไทด์หรือชิ้นส่วนสารพันธุกรรม'},
+        {q:'Frameshift mutation มักเกิดเมื่อใด?',c:['มีการเพิ่มหรือลบนิวคลีโอไทด์ที่ไม่ใช่จำนวนเท่าของ 3','มีการแทนที่เบสแต่รหัสยังเดิม','มี DNA สองสายตามปกติ','มีการสร้าง RNA primer'],a:0,e:'การเพิ่มหรือลบจำนวนเบสที่ไม่เป็นชุดละ 3 ทำให้กรอบการอ่านเลื่อน'},
+        {q:'Silent mutation มีผลอย่างไรต่อกรดอะมิโน?',c:['ไม่ทำให้กรดอะมิโนเปลี่ยน','เปลี่ยนกรดอะมิโนทุกตำแหน่ง','ทำให้เกิดรหัสหยุดเสมอ','ทำให้โครโมโซมเพิ่มหนึ่งแท่ง'],a:0,e:'Silent mutation เปลี่ยนเบสแต่ยังเข้ารหัสกรดอะมิโนชนิดเดิม'},
+        {q:'Missense mutation ทำให้เกิดผลแบบใด?',c:['กรดอะมิโนตำแหน่งหนึ่งเปลี่ยนเป็นอีกชนิด','เกิดรหัสหยุดทันทีทุกครั้ง','ไม่มีการเปลี่ยนแปลงของเบส','โครโมโซมเพิ่มทั้งชุด'],a:0,e:'Missense mutation ทำให้ codon ระบุกรดอะมิโนต่างจากเดิม'},
+        {q:'Nonsense mutation มักทำให้เกิดอะไร?',c:['รหัสหยุดก่อนตำแหน่งปกติ','การจำลอง DNA เพิ่มขึ้น','การจับคู่เบสสมบูรณ์ขึ้น','โครโมโซมกลับทิศ'],a:0,e:'Nonsense mutation เปลี่ยน codon ให้กลายเป็น stop codon'},
+        {q:'Aneuploidy คือภาวะแบบใด?',c:['จำนวนโครโมโซมบางแท่งเกินหรือขาดจากปกติ','จำนวนโครโมโซมเพิ่มเป็นชุดสมบูรณ์','การเปลี่ยนลำดับเบสหนึ่งตำแหน่ง','การสร้าง DNA วงแหวน'],a:0,e:'Aneuploidy คือจำนวนโครโมโซมรายแท่งผิดปกติ เช่น เกินหรือขาดหนึ่งแท่ง'},
+        {q:'Down’s syndrome โดยทั่วไปเกิดจากโครโมโซมคู่ใดเกินมา 1 แท่ง?',c:['คู่ที่ 5','คู่ที่ 13','คู่ที่ 18','คู่ที่ 21'],a:3,e:'Down’s syndrome เกี่ยวข้องกับโครโมโซมคู่ที่ 21 เกินมา 1 แท่ง'}
+      ]
+    ];
+    const hintBank=[
+      ['ยีนเป็นส่วนหนึ่งของโมเลกุลที่เก็บข้อมูลพันธุกรรม','นึกถึง DNA ที่พันรอบโปรตีนฮิสโตน','เป็นคำรวมของข้อมูลพันธุกรรมทั้งหมด','จำคู่เบส A-T และ C-G','เป็นการคัดลอกสารพันธุกรรมก่อนแบ่งเซลล์','แต่ละสายใหม่มีส่วนเก่าเหลืออยู่หนึ่งสาย','สายนี้ใช้เป็นต้นแบบในการต่อเบส','หนึ่งโคดอนมีจำนวนเบสเท่ากับสาม','ระยะนี้มีตัว S อยู่ในชื่อ','พลาสมิดมีรูปร่างเป็นวง'],
+      ['เอนไซม์นี้ทำให้สาย DNA แยกจากกัน','ไพรเมสเริ่มงานด้วยไพรเมอร์ชนิด RNA','เอนไซม์นี้เติมนิวคลีโอไทด์สร้างสาย DNA','เอนไซม์นี้ช่วยแทนที่ไพรเมอร์ RNA ด้วย DNA','ไลเกสทำหน้าที่เหมือนกาวเชื่อม DNA','สายนี้สร้างไปในทิศทางเดียวกับ replication fork','สายนี้สร้างเป็นช่วง ๆ','ชิ้นส่วนนี้เกิดบน lagging strand','DNA ถูกใช้เป็นต้นแบบเพื่อสร้าง RNA','ไรโบโซมอ่าน mRNA แล้วต่อกรดอะมิโน'],
+      ['เป็นการเปลี่ยนแปลงของสารพันธุกรรม','มีการเปลี่ยนเบสตำแหน่งหนึ่งเป็นอีกเบส','มีนิวคลีโอไทด์เพิ่มเข้าไป','มีนิวคลีโอไทด์หรือช่วง DNA หายไป','กรอบการอ่านจะเลื่อนเมื่อจำนวนที่เพิ่ม/ลบไม่ลงตัวเป็นชุดละสาม','รหัสเปลี่ยนได้แต่กรดอะมิโนยังชนิดเดิม','กรดอะมิโนที่ได้เปลี่ยนไปหนึ่งตำแหน่ง','ทำให้เกิด stop codon ก่อนเวลา','จำนวนโครโมโซมบางแท่งเกินหรือขาด','เกี่ยวข้องกับโครโมโซมคู่ที่ 21']
+    ];
+    const stageInfo=[
+      {title:'ด่าน 1 · ป่ารหัส DNA',bg:'assets/level-1.png',height:282},
+      {title:'ด่าน 2 · ห้องทดลองถอดรหัส',bg:'assets/level-2.png',height:265},
+      {title:'ด่าน 3 · หุบเขาการกลายพันธุ์',bg:'assets/level-3.png',height:321}
+    ];
+    const stageNum=Math.min(3,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
+    const stage=stageNum-1, questions=questionBanks[stage], info=stageInfo[stage];
+    const char=localStorage.getItem('playerCharacter')==='boy'?'boy':'girl';
+    const playerName=localStorage.getItem('playerName')||'นักสำรวจ';
+    document.getElementById('levelTitle').textContent=info.title;
+    document.getElementById('playerLabel').textContent=`${playerName} · ${char==='boy'?'ยีน':'ไบโอบี'}`;
+    const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+    const bg=new Image(); bg.src=info.bg;
+    const idle=new Image(); idle.src=char==='boy'?'assets/hero-boy.png':'assets/hero-girl.png';
+    const walking=new Image(); walking.src=char==='boy'?'assets/walk-boy.gif':'assets/walk-girl.gif';
+    const jumping=new Image(); jumping.src=char==='boy'?'assets/jump-boy.png':'assets/jump-girl.png';
+    const W=canvas.width,H=canvas.height,MAP_SCALE=H/info.height,WORLD=1774*MAP_SCALE;
+    const rawPlatforms=[
+      [[0,455,198],[495,603,218],[675,934,188],[955,1198,215],[1228,1515,193],[1538,1774,152]],
+      [[0,284,195],[295,362,197],[430,520,165],[576,735,165],[821,890,132],[952,1057,169],[1115,1223,165],[1264,1365,165],[1437,1518,153],[1545,1609,153],[1625,1774,194]],
+      [[0,213,197],[280,367,180],[420,500,157],[520,756,100],[820,900,133],[952,1038,169],[1062,1132,66],[1150,1260,194],[1296,1518,112],[1540,1774,165]]
+    ];
+    const platforms=rawPlatforms[stage].map(([x0,x1,y])=>({x:x0*MAP_SCALE,y:y*MAP_SCALE,w:(x1-x0)*MAP_SCALE}));
+    function platformAt(x){const found=platforms.filter(p=>x>=p.x&&x<=p.x+p.w).sort((a,b)=>a.y-b.y);return found[0]||platforms.reduce((best,p)=>Math.abs((p.x+p.w/2)-x)<Math.abs((best.x+best.w/2)-x)?p:best,platforms[0]);}
+    const spawnX=26*MAP_SCALE,spawnY=platforms[0].y-94;
+    const rawItems=[
+      [[70,157],[230,157],[330,147],[565,173],[820,150],[1057,180],[1108,154],[1320,154],[1435,151],[1660,143]],
+      [[110,153],[325,151],[480,143],[618,120],[660,136],[855,101],[1000,137],[1183,124],[1340,125],[1660,128]],
+      [[95,155],[320,135],[475,140],[620,55],[675,65],[855,115],[985,145],[1220,130],[1400,75],[1660,120]]
+    ];
+    const items=rawItems[stage].map(([x,y])=>({x:x*MAP_SCALE,y:y*MAP_SCALE,got:false}));
+    const rawHazards=[
+      [],
+      [[690,192,940,246],[1180,192,1320,239]],
+      [[220,254,435,298],[1175,254,1535,300],[1122,88,1150,203]]
+    ];
+    const hazards=rawHazards[stage].map(([x0,y0,x1,y1])=>({x:x0*MAP_SCALE,y:y0*MAP_SCALE,w:(x1-x0)*MAP_SCALE,h:(y1-y0)*MAP_SCALE}));
+    const rawEnemyStarts=[[380,560,850,1110,1645],[225,620,1030,1280,1690],[180,340,700,1000,1450,1660]];
+    const enemies=rawEnemyStarts[stage].map((sourceX,i)=>{const x=sourceX*MAP_SCALE,support=platformAt(x);return{x,home:x,min:Math.max(support.x+5,x-45),max:Math.min(support.x+support.w-65,x+45),dir:i%2?1:-1,speed:1.05,alive:true,y:support.y-65,baseY:support.y-65,vy:0,jumpTimer:25+i*11,squash:0};});
+    const projectiles=[],sparks=[];
+    const player={x:spawnX,y:spawnY,w:68,h:94,vx:0,vy:0,speed:3.2,jump:-12.4,ground:true,face:1,checkpoint:spawnX,checkpointY:spawnY};
+    const keys=new Set(),correctQuestions=new Set(); let camera=0,paused=false,pending=-1,collected=0,wrongAnswers=0,coinsEarned=0,finished=false,hearts=3,money=Number(localStorage.getItem('geneticsCoins'))||0,invulnerable=0,lastShot=0,hintBought=false,muzzleFlash=0;
+    const count=document.getElementById('itemCount');
+    const qOverlay=document.getElementById('questionOverlay'),finishOverlay=document.getElementById('finishOverlay');
+    const held={left:false,right:false};
+    const moneyCount=document.getElementById('moneyCount'),heartCount=document.getElementById('heartCount');
+    const monsterImg=new Image(); monsterImg.src='assets/slime.png';
+    function updateHearts(){heartCount.textContent='❤️'.repeat(hearts)+'♡'.repeat(3-hearts);heartCount.setAttribute('aria-label',`หัวใจ ${hearts} ดวง`);}
+    function updateMoney(){moneyCount.textContent=String(money);localStorage.setItem('geneticsCoins',String(money));}
+    updateHearts();updateMoney();
+    function requestJump(){ if(!paused&&!finished&&player.ground){player.vy=player.jump;player.ground=false;} }
+    function burst(x,y){for(let i=0;i<10;i++){const a=Math.PI*2*i/10,s=1.2+Math.random()*2.8;sparks.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,life:24+Math.random()*10,color:['#b8ff71','#8af8f1','#ffe67a','#ff91c8'][i%4]});}}
+    function shootProjectile(){const now=performance.now();if(paused||finished||now-lastShot<320)return;lastShot=now;muzzleFlash=8;const sx=player.face>0?player.x+player.w:player.x;projectiles.push({x:sx,y:player.y+player.h*.48,vx:player.face*10,life:100});for(let i=0;i<4;i++)sparks.push({x:sx,y:player.y+player.h*.48,vx:player.face*(1+Math.random()*2),vy:(Math.random()-.5)*3,life:9+Math.random()*5,color:'#d7fff5'});}
+    document.querySelector('[data-key="shoot"]').addEventListener('click',e=>{e.preventDefault();shootProjectile();});
+    function keyName(e){ const k=e.key.toLowerCase(); if(['arrowleft','a'].includes(k))return 'left';if(['arrowright','d'].includes(k))return 'right';if([' ','arrowup','w'].includes(k))return 'jump';if(['x','f'].includes(k))return 'shoot';return ''; }
+    window.addEventListener('keydown',e=>{const k=keyName(e);if(k){e.preventDefault();if(k==='shoot'){if(!e.repeat)shootProjectile();return;}keys.add(k);if(k==='jump'&&!e.repeat)requestJump();}});
+    window.addEventListener('keyup',e=>{const k=keyName(e);if(k)keys.delete(k);});
+    document.querySelectorAll('.pad').forEach(btn=>{
+      const k=btn.dataset.key;
+      const down=e=>{e.preventDefault();if(k==='jump')requestJump();else if(k==='shoot')shootProjectile();else{held[k]=true;keys.add(k);}};
+      const up=e=>{e.preventDefault();if(k==='left'||k==='right'){held[k]=false;keys.delete(k);}};
+      btn.addEventListener('pointerdown',down);btn.addEventListener('pointerup',up);btn.addEventListener('pointercancel',up);btn.addEventListener('pointerleave',up);
+    });
+    function openQuestion(index){paused=true;pending=index;hintBought=false;const hintBtn=document.getElementById('buyHint');hintBtn.disabled=false;hintBtn.textContent='🪙 ซื้อคำใบ้ · 3 เหรียญ';document.getElementById('hintText').textContent='';const q=questions[index];document.getElementById('qStage').textContent=`ด่าน ${stageNum} · คำศัพท์`;document.getElementById('qCount').textContent=`ไอเทม ${index+1} / 10`;document.getElementById('questionText').textContent=q.q;const box=document.getElementById('answers');box.replaceChildren();const feedback=document.getElementById('feedback');feedback.textContent='';feedback.className='feedback';document.getElementById('continueBtn').classList.remove('show');const order=q.c.map((text,originalIndex)=>({text,originalIndex}));for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}order.forEach((item,position)=>{const b=document.createElement('button');b.className='answer';b.textContent=`${'กขคง'[position]}. ${item.text}`;b.addEventListener('click',()=>answer(item.originalIndex,b));box.appendChild(b);});qOverlay.classList.add('open');box.querySelector('button')?.focus();}
+    function answer(index,button){const q=questions[pending],feedback=document.getElementById('feedback');if(index===q.a){correctQuestions.add(pending);button.classList.add('correct');document.querySelectorAll('.answer').forEach(b=>b.disabled=true);feedback.textContent=`ถูกต้อง! ${q.e}`;feedback.className='feedback good';document.getElementById('continueBtn').classList.add('show');}else{wrongAnswers++;button.classList.add('wrong');button.disabled=true;feedback.textContent='ยังไม่ใช่ ลองเลือกอีกคำตอบนะ';feedback.className='feedback';}}
+    document.getElementById('buyHint').addEventListener('click',()=>{const feedback=document.getElementById('feedback');if(hintBought)return;if(money<3){feedback.textContent='เหรียญยังไม่พอ ยิงมอนสเตอร์เพื่อสะสมเหรียญนะ';feedback.className='feedback';return;}money-=3;updateMoney();hintBought=true;document.getElementById('buyHint').disabled=true;document.getElementById('buyHint').textContent='ซื้อคำใบ้แล้ว ✓';document.getElementById('hintText').textContent=`คำใบ้: ${hintBank[stage][pending]}`;});
+    function showStageSummary(completed){const result={stage:stageNum,title:info.title,playerName,completed,correct:correctQuestions.size,wrong:wrongAnswers,items:collected,total:10,coins:coinsEarned,hearts};localStorage.setItem('geneticsLastStageResult',JSON.stringify(result));location.href=`summary.html?stage=${stageNum}`;}
+    document.getElementById('continueBtn').addEventListener('click',()=>{items[pending].got=true;collected++;count.textContent=`${collected} / 10`;player.checkpoint=player.x;player.checkpointY=platformAt(player.x+player.w/2).y-player.h;qOverlay.classList.remove('open');paused=false;if(collected===10){finished=true;showStageSummary(true);}});
+    document.getElementById('replay').addEventListener('click',()=>location.reload());
+    function failGame(){finished=true;showStageSummary(false);}
+    function damage(fell=false){if(invulnerable>0||finished)return;hearts=Math.max(0,hearts-1);updateHearts();if(hearts===0){failGame();return;}invulnerable=90;if(fell){items.forEach(it=>it.got=false);collected=0;count.textContent='0 / 10';player.x=spawnX;player.checkpoint=spawnX;player.y=spawnY;player.checkpointY=spawnY;player.vy=0;player.ground=true;document.getElementById('hintText').textContent='';}else{player.x=player.checkpoint;player.y=player.checkpointY;player.vy=-7;player.ground=false;}}
+    function intersects(ax,ay,aw,ah,bx,by,bw,bh){return ax<bx+bw&&ax+aw>bx&&ay<by+bh&&ay+ah>by;}
+    function update(){if(muzzleFlash>0)muzzleFlash--;for(const s of sparks){s.x+=s.vx;s.y+=s.vy;s.vy+=.08;s.life--;}for(let i=sparks.length-1;i>=0;i--)if(sparks[i].life<=0)sparks.splice(i,1);if(paused||finished)return;if(invulnerable>0)invulnerable--;player.vx=0;if(keys.has('left'))player.vx=-player.speed;if(keys.has('right'))player.vx=player.speed;if(player.vx)player.face=Math.sign(player.vx);player.x=Math.max(0,Math.min(WORLD-player.w,player.x+player.vx));const oldBottom=player.y+player.h;player.vy=Math.min(15,player.vy+.58);player.y+=player.vy;player.ground=false;for(const p of platforms){if(player.vy>=0&&oldBottom<=p.y+5&&player.y+player.h>=p.y&&player.x+player.w>p.x&&player.x<p.x+p.w){player.y=p.y-player.h;player.vy=0;player.ground=true;}}
+      if(player.y>H+50){damage(true);return;}
+      for(const z of hazards){if(intersects(player.x+9,player.y+10,player.w-18,player.h-14,z.x,z.y,z.w,z.h)){damage(false);break;}}
+      for(const enemy of enemies){if(!enemy.alive)continue;enemy.x+=enemy.speed*enemy.dir;if(enemy.x>enemy.max||enemy.x<enemy.min)enemy.dir*=-1;if(enemy.y>=enemy.baseY){enemy.jumpTimer--;if(enemy.jumpTimer<=0){enemy.vy=-8.5;enemy.jumpTimer=54+Math.random()*16;}}enemy.vy+=.42;enemy.y+=enemy.vy;if(enemy.y>enemy.baseY){if(enemy.vy>1)enemy.squash=1;enemy.y=enemy.baseY;enemy.vy=0;}enemy.squash=Math.max(0,enemy.squash-.09);if(intersects(player.x+8,player.y+8,player.w-16,player.h-10,enemy.x+7,enemy.y+8,48,50)){damage(false);break;}}
+      for(const shot of projectiles){shot.x+=shot.vx;shot.life--;for(const enemy of enemies){if(enemy.alive&&intersects(shot.x-8,shot.y-7,16,14,enemy.x+5,enemy.y+5,52,54)){enemy.alive=false;shot.life=0;money+=3;coinsEarned+=3;updateMoney();burst(enemy.x+32,enemy.y+30);break;}}}
+      for(let i=projectiles.length-1;i>=0;i--)if(projectiles[i].life<=0||projectiles[i].x<camera-80||projectiles[i].x>camera+W+80)projectiles.splice(i,1);
+      if(finished)return;const next=items.findIndex((it,i)=>!it.got&&intersects(player.x+9,player.y+10,player.w-18,player.h-12,it.x-21,it.y-21,42,42));if(next>=0)openQuestion(next);
+      camera=Math.max(0,Math.min(WORLD-W,player.x-W*.34));}
+    function drawPlatform(p){ctx.fillStyle='#513b2e';ctx.fillRect(p.x-camera,p.y,p.w,H-p.y);ctx.fillStyle='#6ed24f';ctx.fillRect(p.x-camera,p.y,p.w,12);ctx.fillStyle='#a3ed66';ctx.fillRect(p.x-camera,p.y,p.w,4);for(let x=p.x+12;x<p.x+p.w-5;x+=38){ctx.fillStyle='#765743';ctx.fillRect(x-camera,p.y+24,18,5);}}
+    function drawCoin(it){const x=it.x-camera,y=it.y;ctx.save();ctx.shadowColor='#f9cf54';ctx.shadowBlur=18;const g=ctx.createRadialGradient(x-6,y-8,2,x,y,22);g.addColorStop(0,'#fff7bb');g.addColorStop(.45,'#ffdf64');g.addColorStop(1,'#e99321');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,18,0,Math.PI*2);ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#fff1a0';ctx.stroke();ctx.shadowBlur=0;ctx.strokeStyle='#2c91a3';ctx.lineWidth=2.3;ctx.beginPath();ctx.moveTo(x-5,y-9);ctx.bezierCurveTo(x+8,y-5,x-8,y+4,x+5,y+9);ctx.moveTo(x+5,y-9);ctx.bezierCurveTo(x-8,y-5,x+8,y+4,x-5,y+9);ctx.stroke();for(let j=-5;j<=5;j+=5){ctx.beginPath();ctx.moveTo(x-4,y+j);ctx.lineTo(x+4,y+j);ctx.stroke();}ctx.restore();}
+    function drawHazard(z){const x=z.x-camera;ctx.fillStyle='#493943';ctx.fillRect(x,floor-5,z.w,5);ctx.fillStyle='#ed6b6f';for(let i=0;i<z.w;i+=20){ctx.beginPath();ctx.moveTo(x+i,floor-5);ctx.lineTo(x+i+10,floor-29);ctx.lineTo(x+i+20,floor-5);ctx.fill();}}
+    function drawEnemy(enemy){if(!monsterImg.complete||!monsterImg.naturalWidth)return;let sx=1,sy=1;if(enemy.squash>.01){sx=1+.22*enemy.squash;sy=1-.27*enemy.squash;}else if(enemy.vy<-.8){sx=.91;sy=1.13;}else if(enemy.vy>1){sx=1.04;sy=.96;}ctx.save();ctx.translate(enemy.x-camera+32,enemy.y+65);ctx.scale(sx,sy);ctx.drawImage(monsterImg,-32,-65,64,65);ctx.restore();}
+    function drawShot(shot){const x=shot.x-camera;ctx.save();ctx.shadowColor='#8af8f1';ctx.shadowBlur=16;ctx.fillStyle='#8af8f1';ctx.beginPath();ctx.ellipse(x,shot.y,11,7,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(x+2,shot.y-1,3,0,Math.PI*2);ctx.fill();ctx.restore();}
+    function drawPlayer(){const img=!player.ground?jumping:(player.vx!==0?walking:idle);if(!img.complete||!img.naturalWidth)return;ctx.save();if(invulnerable>0&&Math.floor(invulnerable/7)%2===0)ctx.globalAlpha=.4;if(player.face<0){ctx.translate(player.x-camera+player.w,player.y);ctx.scale(-1,1);ctx.drawImage(img,0,0,player.w,player.h);}else ctx.drawImage(img,player.x-camera,player.y,player.w,player.h);ctx.restore();}
+    function drawSparks(){for(let i=sparks.length-1;i>=0;i--){const s=sparks[i],x=s.x-camera;ctx.globalAlpha=Math.max(0,s.life/28);ctx.fillStyle=s.color;ctx.beginPath();ctx.arc(x,s.y,Math.max(1,s.life/7),0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}}
+    function drawMuzzleFlash(){if(muzzleFlash<=0)return;const x=(player.face>0?player.x+player.w:player.x)-camera,y=player.y+player.h*.48;ctx.save();ctx.globalAlpha=muzzleFlash/8;ctx.shadowColor='#c9fff6';ctx.shadowBlur=26;ctx.fillStyle='#efffca';ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+player.face*27,y-12);ctx.lineTo(x+player.face*17,y);ctx.lineTo(x+player.face*27,y+12);ctx.closePath();ctx.fill();ctx.restore();}
+    function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#1b4547';ctx.fillRect(0,0,W,H);if(bg.complete&&bg.naturalWidth){const scaledH=WORLD*bg.height/bg.width;ctx.drawImage(bg,-camera,0,WORLD,scaledH);}ctx.fillStyle='rgba(8,32,37,.16)';ctx.fillRect(0,0,W,H);for(const it of items)if(!it.got)drawCoin(it);for(const enemy of enemies)if(enemy.alive)drawEnemy(enemy);for(const shot of projectiles)drawShot(shot);drawSparks();drawPlayer();drawMuzzleFlash();}
+    function loop(){update();draw();requestAnimationFrame(loop);}loop();
+  </script>
+</body>
+</html>

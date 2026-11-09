@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#142c37">
+  <title>สรุปผลด่าน — Genetics Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 0%,#315d55,#102832 70%);color:#17313c;font-family:Mali,"Noto Sans Thai",sans-serif}
+    .wrap{width:min(560px,100%)}.card{padding:clamp(23px,6vw,42px);border-radius:30px;background:#fff9e9;box-shadow:0 25px 90px #061820a8;text-align:center;animation:pop .35s ease both}.badge{display:inline-block;padding:7px 15px;border-radius:999px;background:#e5f5c8;color:#36573e;font-size:13px;font-weight:700}.icon{font-size:64px;line-height:1.2;margin:13px 0 2px}h1{font-size:clamp(24px,6vw,32px);margin:4px 0 3px}#subtitle{color:#64796e;margin:0 0 22px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:11px;text-align:left}.stat{padding:13px 15px;border:1px solid #dce8d3;border-radius:16px;background:#fff}.stat span{display:block;color:#73857b;font-size:12px}.stat strong{font-size:21px;color:#244c44}.progress{height:12px;background:#e3eadb;border-radius:99px;overflow:hidden;margin:19px 0 6px}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#9ad34c,#5cb875);border-radius:inherit;transition:width .6s ease}.progress-label{font-size:12px;color:#64796e;text-align:right}.actions{display:grid;gap:10px;margin-top:25px}.actions a{display:block;padding:12px 16px;border-radius:14px;text-decoration:none;font-weight:700;background:#c8f36b;color:#19333b}.actions a.secondary{background:#e8eee3;color:#36534a}.credit{color:#d1e4d9;text-align:center;font-size:12px;margin:18px 0 0;opacity:.9}@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="badge" id="stage">สรุปผลด่าน</div>
+      <div class="icon" id="icon">🏆</div>
+      <h1 id="title">จบด่านแล้ว!</h1>
+      <p id="subtitle"></p>
+      <div class="stats">
+        <div class="stat"><span>คำศัพท์ที่ตอบถูก</span><strong id="correct">0 / 10</strong></div>
+        <div class="stat"><span>ตอบผิด</span><strong id="wrong">0 ครั้ง</strong></div>
+        <div class="stat"><span>เหรียญที่ได้จากมอนสเตอร์</span><strong id="coins">🪙 0</strong></div>
+        <div class="stat"><span>หัวใจที่เหลือ</span><strong id="hearts">❤️❤️❤️</strong></div>
+      </div>
+      <div class="progress"><i id="bar"></i></div>
+      <div class="progress-label" id="progressLabel">เก็บไอเทม 0 / 10</div>
+      <nav class="actions" id="actions"></nav>
+    </section>
+    <footer class="credit">พัฒนาโดย ครูภัทรกันย์ กิติยศ</footer>
+  </main>
+  <script>
+    const level=Math.min(3,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
+    let result;try{result=JSON.parse(localStorage.getItem('geneticsLastStageResult')||'null')}catch{}
+    if(!result||result.stage!==level)result={stage:level,title:`ด่าน ${level}`,playerName:localStorage.getItem('playerName')||'นักสำรวจ',completed:false,correct:0,wrong:0,items:0,total:10,coins:0,hearts:3};
+    document.title=`สรุปผล${result.title} — Genetics Quest`;
+    document.getElementById('stage').textContent=result.title;
+    document.getElementById('icon').textContent=result.completed?'🏆':'💔';
+    document.getElementById('title').textContent=result.completed?'ผ่านด่านแล้ว!':'จบรอบการเล่น';
+    document.getElementById('subtitle').textContent=result.completed?`เก่งมาก ${result.playerName} พร้อมไปผจญภัยต่อแล้ว!`:`ไม่เป็นไร ${result.playerName} ลองทบทวนคำศัพท์แล้วกลับมาใหม่นะ`;
+    document.getElementById('correct').textContent=`${result.correct} / 10`;
+    document.getElementById('wrong').textContent=`${result.wrong} ครั้ง`;
+    document.getElementById('coins').textContent=`🪙 ${result.coins}`;
+    document.getElementById('hearts').textContent='❤️'.repeat(result.hearts)+'♡'.repeat(3-result.hearts);
+    document.getElementById('bar').style.width=`${Math.min(100,result.items*10)}%`;
+    document.getElementById('progressLabel').textContent=`เก็บไอเทม ${result.items} / ${result.total}`;
+    const actions=document.getElementById('actions');
+    const link=(text,href,secondary=false)=>{const a=document.createElement('a');a.textContent=text;a.href=href;if(secondary)a.className='secondary';actions.appendChild(a)};
+    if(result.completed&&level<3)link(`ไปด่าน ${level+1} →`,`game.html?stage=${level+1}`);
+    link(result.completed?'เล่นด่านนี้อีกครั้ง':'ลองด่านนี้อีกครั้ง',`game.html?stage=${level}`,result.completed&&level<3);
+    link('กลับไปเลือกด่าน','levels.html',true);
+    if(result.completed&&level===3)link('กลับหน้าแรก','index.html',true);
+  </script>
+</body>
+</html>
