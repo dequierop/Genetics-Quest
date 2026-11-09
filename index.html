@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#132c39" />
+  <title>Genetics Quest — ภารกิจล่าคำศัพท์พันธุศาสตร์</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
+    :root { --ink:#17313c; --cream:#fff9e9; --lime:#c8f36b; --aqua:#83e7e2; --pink:#ff84ad; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--cream); font-family:Mali,"Noto Sans Thai",sans-serif; background:#122934; overflow:hidden; }
+    .scene { position:fixed; inset:0; background:linear-gradient(90deg,rgba(5,25,35,.72),rgba(8,29,37,.48) 50%,rgba(6,22,30,.46)),url('ฉากเกมผจญภัยชีววิทยา-ไม่มีตัวละคร.png') center/cover no-repeat; transform:scale(1.025); filter:saturate(.9); }
+    .scene::after { content:""; position:absolute; inset:0; background:linear-gradient(0deg,rgba(8,25,32,.45),transparent 37%,rgba(8,25,32,.15)); }
+    .grain { position:fixed; inset:0; pointer-events:none; opacity:.12; background-image:radial-gradient(#fff 0.6px,transparent .7px); background-size:5px 5px; mix-blend-mode:soft-light; }
+    main { position:relative; min-height:100vh; display:grid; grid-template-rows:auto 1fr auto; padding:28px clamp(20px,5vw,76px) 22px; }
+    header { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .brand { display:flex; align-items:center; gap:12px; font-weight:700; letter-spacing:.03em; }
+    .brand-mark { display:grid; place-items:center; width:46px;height:46px;border-radius:15px; background:var(--lime); color:#18333a; box-shadow:0 7px 24px #b5ea5a55; font-size:25px; }
+    .brand small { display:block; font-size:11px; line-height:1.1; color:#d3e6dc; letter-spacing:.14em; text-transform:uppercase; }
+    .sound { display:flex; gap:9px; }
+    .sound button { border:1px solid #ffffff55; color:white; background:#102b37a8; border-radius:999px; padding:10px 16px; font:500 14px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; backdrop-filter:blur(8px); transition:.2s; }
+    .sound button:hover,.sound button[aria-pressed="true"] { background:#ffffff25; border-color:#d7ff90; transform:translateY(-1px); }
+    .layout { width:min(1240px,100%); margin:auto; display:grid; grid-template-columns:minmax(320px,1.12fr) minmax(340px,.88fr); align-items:center; gap:clamp(18px,5vw,76px); }
+    .hero-copy { position:relative; z-index:2; padding:24px 0 50px; }
+    .eyebrow { color:var(--lime); font-size:14px; font-weight:600; letter-spacing:.1em; display:flex; align-items:center; gap:10px; }
+    .eyebrow::before { content:""; width:35px; height:2px; background:var(--lime); }
+    h1 { font-size:clamp(42px,6.4vw,84px); line-height:1.05; margin:16px 0 12px; font-weight:700; letter-spacing:-.025em; text-shadow:0 4px 28px #051c2b99; }
+    h1 span { color:var(--lime); display:block; }
+    .desc { max-width:510px; color:#e4eee8; font-size:clamp(16px,1.7vw,20px); line-height:1.65; margin:0 0 25px; }
+    .chips { display:flex; flex-wrap:wrap; gap:9px; margin:0 0 31px; }
+    .chip { border:1px solid #d3f0c75c; color:#f3f6db; background:#163542b5; border-radius:999px; padding:7px 13px; font-size:13px; backdrop-filter:blur(6px); }
+    .play-card { width:min(485px,100%); padding:22px; background:linear-gradient(135deg,#fff9e9f2,#eff6dcf0); color:var(--ink); border:1px solid #fff; border-radius:25px; box-shadow:0 20px 80px #061c27a3, inset 0 1px #fff; }
+    .field-label { display:block; font-size:14px; font-weight:600; margin:0 0 8px 3px; }
+    .name-row { display:flex; gap:10px; }
+    input { min-width:0; flex:1; border:2px solid #d8e3d0; outline:0; border-radius:14px; padding:14px 16px; color:var(--ink); background:#fff; font:500 16px Mali,"Noto Sans Thai",sans-serif; transition:.2s; }
+    input:focus { border-color:#8fbd47; box-shadow:0 0 0 4px #c8f36b55; }
+    input::placeholder { color:#9aaba5; }
+    .start { border:0; border-radius:14px; padding:13px 21px; color:#17313c; background:var(--lime); font:700 17px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; box-shadow:0 5px 0 #91bd45; white-space:nowrap; transition:transform .15s,box-shadow .15s,filter .15s; }
+    .start:hover { filter:brightness(1.05); transform:translateY(-2px); box-shadow:0 7px 0 #91bd45,0 8px 22px #92c94c55; }
+    .start:active { transform:translateY(3px); box-shadow:0 2px 0 #91bd45; }
+    .hint { margin:10px 3px 0; color:#687b75; font-size:12px; min-height:20px; }
+    .art { position:relative; min-height:470px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:15px; }
+    .orb { position:absolute; width:min(35vw,390px); aspect-ratio:1; border-radius:50%; top:8%; left:50%; transform:translateX(-50%); background:radial-gradient(circle at 38% 32%,#c8f36b65,#6de4d32c 48%,#fff0 72%); filter:blur(3px); animation:glow 4s ease-in-out infinite alternate; }
+    .dna { position:absolute; top:11%; left:48%; font-size:78px; opacity:.38; color:#9ff2d9; filter:drop-shadow(0 0 16px #93f0c6); animation:float 3.6s ease-in-out infinite; }
+    .float-tag { position:relative; z-index:3; background:#fffcf1; color:#233d43; border-radius:13px 13px 13px 3px; padding:7px 14px; font-size:13px; font-weight:600; box-shadow:0 5px 24px #081d2899; transform:rotate(-3deg); }
+    .spark { position:absolute; z-index:1; color:#ffe78a; font-size:27px; animation:twinkle 1.5s ease-in-out infinite; }
+    .s1 { top:19%; right:14%; } .s2 { top:43%; left:15%; animation-delay:.6s; font-size:19px; }
+    .character-showcase { position:relative; z-index:2; width:min(390px,90%); height:320px; display:grid; place-items:center; }
+    .character-showcase img { display:block; height:280px; max-height:calc(100% - 32px); width:auto; max-width:90%; object-fit:contain; filter:drop-shadow(0 15px 20px #071f2b88); animation:heroBob 2.6s ease-in-out infinite; }
+    .character-name { position:absolute; bottom:3px; left:50%; transform:translateX(-50%); padding:5px 16px; border:1px solid #ffffff55; border-radius:999px; color:#f7ffe5; background:#102b37c9; backdrop-filter:blur(7px); font-size:13px; white-space:nowrap; }
+    .choice-wrap { position:relative; z-index:3; text-align:center; }
+    .choice-title { margin:0 0 8px; color:#f4f2df; font-size:13px; text-shadow:0 2px 9px #061c28; }
+    .choice-row { display:flex; justify-content:center; gap:10px; }
+    .choice { display:flex; align-items:center; gap:8px; border:1px solid #ffffff68; border-radius:15px; background:#102c39d9; color:#fff; padding:6px 13px 6px 7px; font:500 14px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; transition:.18s; backdrop-filter:blur(8px); }
+    .choice img { width:35px; height:42px; object-fit:contain; }
+    .choice:hover { transform:translateY(-2px); background:#214653ed; }
+    .choice[aria-pressed="true"] { border:2px solid var(--lime); padding:5px 12px 5px 6px; color:var(--lime); box-shadow:0 0 0 3px #c8f36b33,0 6px 18px #071c2680; }
+    footer { display:flex; align-items:center; justify-content:space-between; gap:16px; color:#d8e7dd; font-size:12px; }
+    footer .note { opacity:.88; } .version { letter-spacing:.14em; text-transform:uppercase; opacity:.7; }
+    .modal { position:fixed; z-index:10; inset:0; display:none; place-items:center; padding:22px; background:#081b25c9; backdrop-filter:blur(12px); }
+    .modal.open { display:grid; animation:fade .3s ease; }
+    .modal-card { width:min(500px,100%); padding:36px; text-align:center; color:var(--ink); background:var(--cream); border-radius:28px; box-shadow:0 24px 100px #0008; animation:pop .35s cubic-bezier(.2,.8,.2,1); }
+    .modal-icon { font-size:52px; }
+    .modal-card h2 { font-size:30px; margin:5px 0 8px; }
+    .modal-card p { color:#526b69; margin:0 0 22px; }
+    .modal-card button { border:0; background:var(--lime); color:var(--ink); padding:11px 24px; border-radius:13px; font:700 16px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; }
+    .shake { animation:shake .35s linear; }
+    @keyframes float { 50% { transform:translateY(-14px) rotate(4deg); } }
+    @keyframes glow { to { opacity:.65; transform:translateX(-50%) scale(1.08); } }
+    @keyframes heroBob { 50% { transform:translateY(-7px); } }
+    @keyframes monsterBob { 50% { transform:translateY(-5px) rotate(2deg); } }
+    @keyframes twinkle { 50% { opacity:.35; transform:scale(.75) rotate(30deg); } }
+    @keyframes fade { from { opacity:0 } to { opacity:1 } }
+    @keyframes pop { from { transform:translateY(15px) scale(.96); opacity:0 } to { transform:none; opacity:1 } }
+    @keyframes shake { 25% { transform:translateX(-6px) } 50% { transform:translateX(6px) } 75% { transform:translateX(-3px) } }
+    @media (max-width:800px) {
+      body { overflow:auto; }
+      main { min-height:100svh; padding:17px 19px 16px; }
+      .layout { grid-template-columns:1fr; gap:0; width:min(570px,100%); padding-top:30px; }
+      .hero-copy { padding:10px 0 0; }
+      h1 { font-size:clamp(46px,12vw,70px); }
+      .desc { font-size:16px; margin-bottom:17px; }
+      .chips { margin-bottom:20px; }
+      .play-card { padding:17px; }
+      .art { min-height:350px; order:-1; margin-bottom:0; gap:7px; }
+      .orb { width:270px; top:2%; }
+      .dna { top:2%; font-size:56px; }
+      .character-showcase { height:245px; }
+      .character-showcase img { height:205px; max-height:205px; }
+      .float-tag { font-size:11px; }
+      .choice { font-size:13px; }
+      footer { margin-top:20px; justify-content:center; flex-wrap:wrap; row-gap:4px; text-align:center; }
+    }
+    @media (max-width:420px) { .sound button { padding:8px 10px; font-size:12px; } .brand { font-size:14px; } .brand-mark { width:40px;height:40px; } .name-row { flex-direction:column; } .start { width:100%; } .art { min-height:315px; } .character-showcase { height:220px; } .character-showcase img { height:180px; max-height:180px; } .choice { padding-right:9px; font-size:12px; } .choice img { width:30px; height:36px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; } }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true"></div><div class="grain" aria-hidden="true"></div>
+  <main>
+    <header>
+      <div class="brand"><div class="brand-mark">🧬</div><div>GENETICS QUEST<small>Biology adventure · M.4</small></div></div>
+      <div class="sound" aria-label="ตั้งค่าเสียง">
+        <button id="musicBtn" aria-pressed="false" title="เปิดหรือปิดเพลงประกอบ">♫ เพลง: ปิด</button>
+        <button id="sfxBtn" aria-pressed="true" title="เปิดหรือปิดเสียงปุ่ม">🔊 เสียงปุ่ม</button>
+      </div>
+    </header>
+    <section class="layout" aria-label="หน้าเริ่มเกม">
+      <div class="hero-copy">
+        <div class="eyebrow">พร้อมออกผจญภัยหรือยัง?</div>
+        <h1>ไขรหัส<span>พันธุกรรม</span></h1>
+        <p class="desc">ออกเดินทางในโลก DNA เก็บไอเทม เรียนรู้คำศัพท์พันธุศาสตร์ และตอบคำถามเพื่อผ่านด่าน</p>
+        <div class="chips"><span class="chip">🧬 85 คำศัพท์</span><span class="chip">🧠 คำถาม 3–4 ตัวเลือก</span><span class="chip">🌿 3 ด่านผจญภัย</span></div>
+        <form class="play-card" id="startForm">
+          <label class="field-label" for="playerName">นักผจญภัยชื่ออะไร?</label>
+          <div class="name-row"><input id="playerName" name="playerName" maxlength="18" autocomplete="given-name" placeholder="พิมพ์ชื่อของคุณ" /><button class="start" type="submit">เริ่มเกม <span aria-hidden="true">➜</span></button></div>
+          <div class="hint" id="hint" aria-live="polite">ใส่ชื่อแล้วไปทำภารกิจล่าคำศัพท์กันเลย!</div>
+        </form>
+      </div>
+      <div class="art" aria-label="เลือกตัวละครนักผจญภัย">
+        <div class="orb"></div><div class="dna" aria-hidden="true">🧬</div>
+        <span class="float-tag">เลือกนักผจญภัยของคุณ</span><span class="spark s1">✦</span><span class="spark s2">✧</span>
+        <div class="character-showcase"><img id="selectedAvatar" src="ตัวละครผู้หญิง-เลือก.png" alt="ตัวละครผู้หญิงยืน" /><span class="character-name" id="characterName">ไบโอบี — นักสำรวจสาว</span></div>
+        <div class="choice-wrap"><p class="choice-title">เลือกตัวละคร</p><div class="choice-row">
+          <button class="choice" type="button" data-character="girl" aria-pressed="true"><img src="ตัวละครผู้หญิง-เลือก.png" alt="" />ไบโอบี</button>
+          <button class="choice" type="button" data-character="boy" aria-pressed="false"><img src="ตัวละครผู้ชาย-เลือก.png" alt="" />ยีน</button>
+        </div></div>
+      </div>
+    </section>
+    <footer><span class="note">เรียนรู้คำศัพท์พันธุศาสตร์ผ่านการผจญภัย</span><span class="credit">พัฒนาโดย ครูภัทรกันย์ กิติยศ</span><span class="version">DNA · Gene · Quest</span></footer>
+  </main>
+  <div class="modal" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal-card"><div class="modal-icon">🧬✨</div><h2 id="welcomeTitle">ยินดีต้อนรับ!</h2><p id="welcomeText"></p><button id="closeWelcome">ไปกันเลย!</button></div>
+  </div>
+  <script>
+    let audioCtx, musicTimer, musicOn=false, sfxOn=true, noteIndex=0;
+    const melody=[392,440,523.25,587.33,523.25,440,349.23,392,440,523.25,659.25,587.33,523.25,440,392,349.23];
+    function context(){ if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+    function tone(freq,duration=.12,type='sine',volume=.045,delay=0){
+      const c=context(), now=c.currentTime+delay, osc=c.createOscillator(), gain=c.createGain();
+      osc.type=type; osc.frequency.setValueAtTime(freq,now); gain.gain.setValueAtTime(.0001,now); gain.gain.exponentialRampToValueAtTime(volume,now+.012); gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+      osc.connect(gain); gain.connect(c.destination); osc.start(now); osc.stop(now+duration+.02);
+    }
+    function clickSound(){ if(sfxOn){ tone(660,.07,'triangle',.045); tone(990,.11,'sine',.025,.045); } }
+    function playMusic(){ if(musicOn) return; musicOn=true; context(); noteIndex=0; const tick=()=>{ if(!musicOn)return; const f=melody[noteIndex%melody.length]; tone(f,.28,'sine',.018); if(noteIndex%4===0) tone(f/2,.44,'triangle',.012); noteIndex++; musicTimer=setTimeout(tick,310); }; tick(); }
+    function stopMusic(){ musicOn=false; clearTimeout(musicTimer); }
+    const musicBtn=document.getElementById('musicBtn'), sfxBtn=document.getElementById('sfxBtn');
+    musicBtn.addEventListener('click',()=>{ clickSound(); if(musicOn){stopMusic();musicBtn.textContent='♫ เพลง: ปิด';musicBtn.setAttribute('aria-pressed','false');}else{playMusic();musicBtn.textContent='♫ เพลง: เปิด';musicBtn.setAttribute('aria-pressed','true');} });
+    sfxBtn.addEventListener('click',()=>{ sfxOn=!sfxOn; sfxBtn.textContent=sfxOn?'🔊 เสียงปุ่ม':'🔇 เสียงปุ่ม'; sfxBtn.setAttribute('aria-pressed',String(sfxOn)); if(sfxOn)clickSound(); });
+    document.querySelectorAll('button').forEach(b=>{ if(b.id!=='musicBtn'&&b.id!=='sfxBtn') b.addEventListener('click',clickSound); });
+    const form=document.getElementById('startForm'),nameInput=document.getElementById('playerName'),hint=document.getElementById('hint'),modal=document.getElementById('welcome');
+    let selectedCharacter='ไบโอบี — นักสำรวจสาว';
+    localStorage.setItem('playerCharacter','girl');
+    document.querySelectorAll('.choice').forEach(button=>button.addEventListener('click',()=>{
+      clickSound();
+      const boy=button.dataset.character==='boy';
+      selectedCharacter=boy?'ยีน — นักสำรวจหนุ่ม':'ไบโอบี — นักสำรวจสาว';
+      localStorage.setItem('playerCharacter',boy?'boy':'girl');
+      const avatar=document.getElementById('selectedAvatar');
+      avatar.src=boy?'ตัวละครผู้ชาย-เลือก.png':'ตัวละครผู้หญิง-เลือก.png';
+      avatar.alt=boy?'ตัวละครผู้ชายยืน':'ตัวละครผู้หญิงยืน';
+      document.getElementById('characterName').textContent=selectedCharacter;
+      document.querySelectorAll('.choice').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+    }));
+    form.addEventListener('submit',e=>{ e.preventDefault(); clickSound(); const name=nameInput.value.trim(); if(!name){hint.textContent='ใส่ชื่อก่อนเริ่มการผจญภัยนะ';nameInput.focus();form.classList.remove('shake');void form.offsetWidth;form.classList.add('shake');return;} localStorage.setItem('playerName',name);document.getElementById('welcomeText').textContent=`${name} และ ${selectedCharacter} พร้อมแล้ว! เตรียมออกตามหา DNA และพิชิตคำศัพท์พันธุศาสตร์กัน`;modal.classList.add('open');document.getElementById('closeWelcome').focus(); });
+    document.getElementById('closeWelcome').addEventListener('click',()=>{window.location.href='เลือกด่านเกมคำศัพท์พันธุศาสตร์.html';});
+    modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('open')});
+  </script>
+</body>
+</html>
