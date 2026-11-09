@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#142c37">
+  <title>สรุปส่งครู — Genetics Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;padding:24px;background:radial-gradient(ellipse at 50% 0%,#315d55,#102832 70%);font-family:Mali,"Noto Sans Thai",sans-serif;color:#17313c}.sheet{width:min(820px,100%);margin:0 auto;background:#fff9e9;border-radius:26px;padding:clamp(20px,5vw,42px);box-shadow:0 25px 90px #061820a8}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.tag{display:inline-block;background:#e5f5c8;color:#36573e;padding:7px 13px;border-radius:99px;font-size:12px;font-weight:700}.title{margin:15px 0 4px;font-size:clamp(25px,5vw,36px)}.sub{color:#63776d;margin:0 0 22px}.student{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px 16px;border-radius:15px;background:#edf5e6;margin-bottom:15px}.student strong{color:#284c43}.table-wrap{overflow-x:auto;border:1px solid #d9e4d2;border-radius:15px}table{width:100%;border-collapse:collapse;min-width:550px}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid #e1e8dc;font-size:13px}th{background:#eaf2e3;color:#526b5e}tbody tr:last-child td{border-bottom:0}.status{font-weight:700}.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.total{padding:13px;border:1px solid #dce8d3;border-radius:14px;background:white}.total small{display:block;color:#73857b;font-size:11px}.total strong{font-size:18px;color:#244c44}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.actions button,.actions a{border:0;border-radius:12px;padding:11px 15px;background:#c8f36b;color:#19333b;font:700 13px Mali,sans-serif;text-decoration:none;cursor:pointer}.actions .secondary{background:#e8eee3;color:#36534a}.message{min-height:22px;margin:12px 0 0;color:#39744f;font-size:12px}.credit{text-align:center;color:#d1e4d9;font-size:12px;margin:16px 0 0}.print-head{display:none}@media(max-width:560px){body{padding:12px}.sheet{border-radius:20px;padding:20px 15px}.totals{grid-template-columns:1fr 1fr}.actions{display:grid}.actions>*{text-align:center}}@media print{body{padding:0;background:white}.sheet{box-shadow:none;border:0;width:100%;padding:0}.actions,.message,.credit,.top a{display:none!important}.print-head{display:block;color:#63776d;font-size:12px}.title{font-size:26px}}
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <div class="top"><span class="tag">รายงานผลการเรียนรู้</span><a class="tag" href="summary.html">← กลับหน้าสรุป</a></div>
+    <h1 class="title">สรุปผลส่งคุณครู</h1>
+    <p class="sub">Genetics Quest · เกมคำศัพท์พันธุศาสตร์ ม.4</p>
+    <div class="student"><span>นักเรียน: <strong id="studentName">นักสำรวจ</strong></span><span>วันที่: <strong id="date"></strong></span></div>
+    <div class="table-wrap"><table><thead><tr><th>ด่าน</th><th>ผลการเล่น</th><th>ตอบถูก</th><th>ตอบผิด</th><th>เก็บไอเทม</th></tr></thead><tbody id="rows"></tbody></table></div>
+    <section class="totals"><div class="total"><small>ผ่านทั้งหมด</small><strong id="passed">0 / 3 ด่าน</strong></div><div class="total"><small>คำถามที่ตอบถูก</small><strong id="correct">0 / 30</strong></div><div class="total"><small>เหรียญที่ได้รับ</small><strong id="coins">🪙 0</strong></div></section>
+    <p class="print-head">พัฒนาโดย ครูภัทรกันย์ กิติยศ</p>
+    <nav class="actions"><button id="share">แชร์สรุป</button><button id="copy">คัดลอกข้อความ</button><button id="print" class="secondary">พิมพ์ / บันทึก PDF</button><a href="levels.html" class="secondary">กลับไปเลือกด่าน</a></nav>
+    <p class="message" id="message" role="status" aria-live="polite"></p>
+  </main>
+  <footer class="credit">พัฒนาโดย ครูภัทรกันย์ กิติยศ</footer>
+  <script>
+    const names=['ป่ารหัส DNA','ห้องทดลองถอดรหัส','หุบเขาการกลายพันธุ์'];let history={};try{history=JSON.parse(localStorage.getItem('geneticsStageResults')||'{}')}catch{}
+    const last=JSON.parse(localStorage.getItem('geneticsLastStageResult')||'null');if(last&&last.stage&&!history[last.stage])history[last.stage]=last;
+    const entries=names.map((name,i)=>history[i+1]||{stage:i+1,title:`ด่าน ${i+1} · ${name}`,completed:false,correct:0,wrong:0,items:0,total:10,coins:0,hearts:0});
+    const player=(last&&last.playerName)||localStorage.getItem('playerName')||'นักสำรวจ';document.getElementById('studentName').textContent=player;document.getElementById('date').textContent=new Date().toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'});
+    const rows=document.getElementById('rows');entries.forEach((r,i)=>{const tr=document.createElement('tr');const vals=[r.title||`ด่าน ${i+1} · ${names[i]}`,r.completed?'ผ่านด่าน':'ยังไม่ผ่าน',`${r.correct||0} / 10`,`${r.wrong||0} ครั้ง`,`${r.items||0} / 10`];vals.forEach((v,j)=>{const td=document.createElement('td');td.textContent=v;if(j===1)td.className='status';tr.appendChild(td)});rows.appendChild(tr)});
+    const passed=entries.filter(r=>r.completed).length,correct=entries.reduce((sum,r)=>sum+(r.correct||0),0),coins=entries.reduce((sum,r)=>sum+(r.coins||0),0);document.getElementById('passed').textContent=`${passed} / 3 ด่าน`;document.getElementById('correct').textContent=`${correct} / 30`;document.getElementById('coins').textContent=`🪙 ${coins}`;
+    const report=[`สรุปผล Genetics Quest · คำศัพท์พันธุศาสตร์ ม.4`,`นักเรียน: ${player}`,`วันที่: ${new Date().toLocaleDateString('th-TH')}`,'',...entries.map((r,i)=>`ด่าน ${i+1} ${names[i]}: ${r.completed?'ผ่านด่าน':'ยังไม่ผ่าน'} | ตอบถูก ${r.correct||0}/10 | ตอบผิด ${r.wrong||0} ครั้ง | เก็บไอเทม ${r.items||0}/10`),'',`ผ่าน ${passed}/3 ด่าน · ตอบถูก ${correct}/30 · ได้เหรียญ ${coins}`,`พัฒนาโดย ครูภัทรกันย์ กิติยศ`].join('\n');
+    const msg=document.getElementById('message');document.getElementById('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(report);msg.textContent='คัดลอกสรุปแล้ว นำไปส่งคุณครูได้เลย';}catch{const ta=document.createElement('textarea');ta.value=report;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();msg.textContent='คัดลอกสรุปแล้ว นำไปส่งคุณครูได้เลย';}});
+    document.getElementById('share').addEventListener('click',async()=>{if(navigator.share){try{await navigator.share({title:'สรุปผล Genetics Quest',text:report});}catch(e){}}else{document.getElementById('copy').click();}});
+    document.getElementById('print').addEventListener('click',()=>window.print());
+  </script>
+</body>
+</html>

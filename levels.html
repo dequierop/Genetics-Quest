@@ -44,6 +44,7 @@
     .selected-label { color:#d9e7dd; font-size:13px; }
     .selected-name { color:var(--lime); font-weight:700; margin-left:5px; }
     .start { border:0; border-radius:14px; padding:12px 24px; color:var(--ink); background:var(--lime); font:700 16px Mali,"Noto Sans Thai",sans-serif; cursor:pointer; box-shadow:0 5px 0 #91bd45; transition:.18s; }
+    .shop-start { border:1px solid #ffe58a;border-radius:14px;padding:11px 18px;background:#263f49;color:#fff5c7;font:700 14px Mali,"Noto Sans Thai",sans-serif;cursor:pointer;box-shadow:0 4px 0 #152c34; }
     .start:hover { transform:translateY(-2px); box-shadow:0 7px 0 #91bd45,0 10px 22px #92c94c55; }
     .start:active { transform:translateY(3px); box-shadow:0 2px 0 #91bd45; }
     footer { margin-top:auto; display:flex; justify-content:space-between; align-items:center; gap:10px; color:#d8e7dd; font-size:11px; opacity:.85; }
@@ -79,7 +80,7 @@
         <div class="stage-content"><h2 class="stage-title">หุบเขาการกลายพันธุ์</h2><p class="stage-desc">สำรวจชนิดของมิวเทชันและความผิดปกติของโครโมโซม</p><div class="tags"><span class="tag">Mutation</span><span class="tag">Aneuploidy</span><span class="tag">Syndrome</span></div><div class="stage-foot"><span>สำหรับนักสำรวจมือโปร</span><span class="level-dots">●●●</span></div></div>
       </button>
     </section>
-    <div class="action-row"><div class="selected-label">ด่านที่เลือก:<span class="selected-name" id="selectedName">ป่ารหัส DNA</span></div><button class="start" id="confirmStage">เลือกด่านนี้ ✓</button></div>
+    <div class="action-row"><div class="selected-label">ด่านที่เลือก:<span class="selected-name" id="selectedName">ป่ารหัส DNA</span></div><button class="shop-start" id="openShop">🛒 ร้านค้า</button><button class="start" id="confirmStage">เลือกด่านนี้ ✓</button></div>
     <footer><span>🧬 Genetics Quest · คำศัพท์พันธุศาสตร์ ม.4</span><span>พัฒนาโดย ครูภัทรกันย์ กิติยศ</span><span>เก็บไอเทม · เรียนรู้ · พิชิตด่าน</span></footer>
   </main>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -90,6 +91,7 @@
     let chosen=cards[0];
     function sound(){ try { const c=new (window.AudioContext||window.webkitAudioContext)(); const o=c.createOscillator(),g=c.createGain(); o.type='triangle';o.frequency.value=680;g.gain.setValueAtTime(.04,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.12);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.13);o.onended=()=>c.close(); } catch(e){} }
     cards.forEach(card=>card.addEventListener('click',()=>{sound();chosen=card;cards.forEach(x=>x.setAttribute('aria-pressed',String(x===card)));selected.textContent=card.dataset.name;}));
+    document.getElementById('openShop').addEventListener('click',()=>{sound();window.location.href=`shop.html?stage=${chosen.dataset.stage}`;});
     document.getElementById('confirmStage').addEventListener('click',()=>{sound();try{const lock=screen.orientation?.lock?.('landscape');if(lock)lock.catch(()=>{});}catch(e){}window.location.href=`game.html?stage=${chosen.dataset.stage}`;});
   </script>
 </body>

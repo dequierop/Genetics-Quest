@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#142c37">
+  <title>ร้านค้า — Genetics Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box}body{margin:0;min-height:100svh;color:#fff9e9;background:radial-gradient(ellipse at 50% 0%,#315d55,#102832 70%);font-family:Mali,"Noto Sans Thai",sans-serif}main{width:min(1000px,100%);min-height:100svh;margin:auto;padding:clamp(18px,4vw,40px);display:flex;flex-direction:column}header{display:flex;justify-content:space-between;align-items:center;gap:14px}.back{color:white;text-decoration:none;border:1px solid #ffffff55;background:#17333ed9;padding:9px 14px;border-radius:999px;font-size:13px}.brand{font-weight:700;letter-spacing:.04em}.brand small{display:block;color:#cfe1d8;font-size:11px}.intro{text-align:center;margin:32px 0 22px}.intro .icon{font-size:42px}.intro h1{font-size:clamp(26px,5vw,38px);margin:2px 0 5px}.intro p{color:#d2e5d8;margin:0}.wallet{align-self:center;background:#183c45;border:1px solid #ffffff38;border-radius:999px;padding:9px 17px;margin-bottom:22px;font-weight:700;color:#ffe58a}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.item{position:relative;padding:22px 19px 18px;border:1px solid #e2f1ce50;border-radius:23px;background:linear-gradient(145deg,#193b47ee,#17323ded);box-shadow:0 16px 35px #06182070;display:flex;flex-direction:column;min-height:290px}.item .emoji{font-size:50px;line-height:1.15}.item h2{font-size:19px;margin:12px 0 5px}.item p{color:#d4e1d8;font-size:13px;line-height:1.6;margin:0 0 15px;flex:1}.stock{font-size:12px;color:#d7edb0;margin-bottom:9px}.buy{width:100%;border:0;border-radius:13px;background:#c8f36b;color:#19333b;padding:11px 12px;font:700 14px Mali,sans-serif;cursor:pointer;box-shadow:0 4px 0 #91bd45;touch-action:manipulation}.buy:disabled{opacity:.48;cursor:default;box-shadow:none}.notice{min-height:24px;margin:15px 0 0;text-align:center;color:#ffe58a;font-size:13px}.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px 0 24px}.actions button{border:0;border-radius:14px;padding:12px 19px;background:#c8f36b;color:#19333b;font:700 15px Mali,sans-serif;cursor:pointer}.actions .secondary{border:1px solid #ffffff55;background:#17333ed9;color:white}footer{margin-top:auto;text-align:center;color:#d1e4d9;font-size:12px;opacity:.85}@media(max-width:720px){main{padding:18px 14px}.intro{margin:22px 0 16px}.cards{grid-template-columns:1fr;max-width:500px;width:100%;margin:auto}.item{min-height:0;display:grid;grid-template-columns:60px 1fr;column-gap:12px;padding:16px}.item .emoji{grid-row:1 / span 3;font-size:42px}.item h2{margin:0}.item p{margin:3px 0 8px}.stock,.buy{grid-column:2}.actions{display:grid;max-width:500px;width:100%;margin:14px auto 20px}}
+  </style>
+</head>
+<body>
+  <main>
+    <header><div class="brand">🧬 GENETICS QUEST<small>ร้านเตรียมของก่อนลงด่าน</small></div><a class="back" href="levels.html">← เลือกด่าน</a></header>
+    <section class="intro"><div class="icon">🛒✨</div><h1>ร้านค้าของนักสำรวจ</h1><p id="stageTitle">เตรียมไอเทมให้พร้อมก่อนออกผจญภัย</p></section>
+    <div class="wallet">🪙 เหรียญของคุณ <span id="coins">0</span></div>
+    <section class="cards" aria-label="รายการไอเทมในร้านค้า">
+      <article class="item"><div class="emoji">🪽</div><h2>ปีกกันตก</h2><p>ป้องกันหัวใจหายเมื่อตกเหว ใช้แล้วหายไป 1 ชิ้น</p><div class="stock" id="shieldStock">มีอยู่ 0 ชิ้น</div><button class="buy" id="buyShield">ซื้อ · 5 เหรียญ</button></article>
+      <article class="item"><div class="emoji">❤️</div><h2>หัวใจพิเศษ</h2><p>เพิ่มหัวใจเริ่มต้น 1 ดวง ซื้อได้สูงสุด 2 ดวงต่อรอบ</p><div class="stock" id="heartStock">ซื้อแล้ว 0 / 2 ดวง</div><button class="buy" id="buyHeart">ซื้อ · 8 เหรียญ</button></article>
+      <article class="item"><div class="emoji">💡</div><h2>ตั๋วคำใบ้</h2><p>ใช้ตอบคำถามข้อหนึ่งได้โดยไม่เสียเหรียญเพิ่ม</p><div class="stock" id="hintStock">มีอยู่ 0 ใบ</div><button class="buy" id="buyHint">ซื้อ · 3 เหรียญ</button></article>
+    </section>
+    <div class="notice" id="notice" role="status" aria-live="polite">ไอเทมที่ซื้อจะติดตัวไปเมื่อเริ่มด่านนี้</div>
+    <div class="actions"><button id="startGame">เริ่มด่านนี้ →</button><button class="secondary" id="backLevels">กลับไปเลือกด่าน</button></div>
+    <footer>พัฒนาโดย ครูภัทรกันย์ กิติยศ</footer>
+  </main>
+  <script>
+    const stage=Math.min(3,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
+    const names=['','ป่ารหัส DNA','ห้องทดลองถอดรหัส','หุบเขาการกลายพันธุ์'];
+    const COST={shield:5,heart:8,hint:3},LIMIT={shield:3,extraHearts:2,hintTickets:10};
+    const readInventory=()=>{try{return JSON.parse(localStorage.getItem('geneticsPendingInventory')||'{}')}catch{return {}}};
+    let inventory={shield:0,extraHearts:0,hintTickets:0,...readInventory()},coins=Number(localStorage.getItem('geneticsCoins'))||0;
+    const coinsEl=document.getElementById('coins'),notice=document.getElementById('notice');
+    document.getElementById('stageTitle').textContent=`เตรียมของก่อนเข้าด่าน ${stage} · ${names[stage]}`;
+    function save(){localStorage.setItem('geneticsPendingInventory',JSON.stringify(inventory));localStorage.setItem('geneticsCoins',String(coins));render();}
+    function render(){coinsEl.textContent=coins;document.getElementById('shieldStock').textContent=`มีอยู่ ${inventory.shield} ชิ้น`;document.getElementById('heartStock').textContent=`ซื้อแล้ว ${inventory.extraHearts} / 2 ดวง`;document.getElementById('hintStock').textContent=`มีอยู่ ${inventory.hintTickets} ใบ`;document.getElementById('buyShield').disabled=inventory.shield>=LIMIT.shield||coins<COST.shield;document.getElementById('buyHeart').disabled=inventory.extraHearts>=LIMIT.extraHearts||coins<COST.heart;document.getElementById('buyHint').disabled=inventory.hintTickets>=LIMIT.hintTickets||coins<COST.hint;}
+    function buy(key,limit,price,label){if(inventory[key]>=limit){notice.textContent='มีไอเทมชนิดนี้ครบตามจำนวนสูงสุดแล้ว';return;}if(coins<price){notice.textContent='เหรียญไม่พอ ยิงมอนสเตอร์ในด่านเพื่อเก็บเหรียญเพิ่มนะ';return;}coins-=price;inventory[key]++;save();notice.textContent=`ซื้อ${label}แล้ว! จะได้รับเมื่อเริ่มด่าน`;}
+    document.getElementById('buyShield').addEventListener('click',()=>buy('shield',LIMIT.shield,COST.shield,'ปีกกันตก'));
+    document.getElementById('buyHeart').addEventListener('click',()=>buy('extraHearts',LIMIT.extraHearts,COST.heart,'หัวใจพิเศษ'));
+    document.getElementById('buyHint').addEventListener('click',()=>buy('hintTickets',LIMIT.hintTickets,COST.hint,'ตั๋วคำใบ้'));
+    document.getElementById('startGame').addEventListener('click',()=>{try{const lock=screen.orientation?.lock?.('landscape');if(lock)lock.catch(()=>{});}catch(e){}location.href=`game.html?stage=${stage}`;});
+    document.getElementById('backLevels').addEventListener('click',()=>location.href='levels.html');render();
+  </script>
+</body>
+</html>
