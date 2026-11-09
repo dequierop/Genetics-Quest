@@ -52,7 +52,7 @@
     if(result.completed&&level<3)link(`ไปด่าน ${level+1} →`,`game.html?stage=${level+1}`);
     link(result.completed?'เล่นด่านนี้อีกครั้ง':'ลองด่านนี้อีกครั้ง',`game.html?stage=${level}`,result.completed&&level<3);
     link('🛒 ไปที่ร้านค้า',`shop.html?stage=${level}`,true);
-    link('📄 เตรียมสรุปส่งครู','teacher-report.html',true);
+    link('🖼️ สรุปส่งครูเป็นภาพ','teacher-report.html',true);
     link('กลับไปเลือกด่าน','levels.html',true);
     if(result.completed&&level===3)link('กลับหน้าแรก','index.html',true);
   </script>
