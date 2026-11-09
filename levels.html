@@ -90,7 +90,7 @@
     let chosen=cards[0];
     function sound(){ try { const c=new (window.AudioContext||window.webkitAudioContext)(); const o=c.createOscillator(),g=c.createGain(); o.type='triangle';o.frequency.value=680;g.gain.setValueAtTime(.04,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.12);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.13);o.onended=()=>c.close(); } catch(e){} }
     cards.forEach(card=>card.addEventListener('click',()=>{sound();chosen=card;cards.forEach(x=>x.setAttribute('aria-pressed',String(x===card)));selected.textContent=card.dataset.name;}));
-    document.getElementById('confirmStage').addEventListener('click',()=>{sound();window.location.href=`game.html?stage=${chosen.dataset.stage}`;});
+    document.getElementById('confirmStage').addEventListener('click',()=>{sound();try{const lock=screen.orientation?.lock?.('landscape');if(lock)lock.catch(()=>{});}catch(e){}window.location.href=`game.html?stage=${chosen.dataset.stage}`;});
   </script>
 </body>
 </html>

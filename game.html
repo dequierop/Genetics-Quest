@@ -33,7 +33,7 @@
     .pad:active { transform:scale(.93);filter:brightness(1.15); }
     .overlay { position:fixed; z-index:10; inset:0; display:none; place-items:center; padding:18px; background:#071b25c9; backdrop-filter:blur(9px); }
     .overlay.open { display:grid; animation:fade .2s ease; }
-    .question-card { width:min(580px,100%); padding:26px; border-radius:24px; background:var(--cream); color:var(--ink); box-shadow:0 25px 90px #0008; animation:pop .25s ease; }
+    .question-card { width:min(580px,100%); max-height:calc(100svh - 28px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; padding:26px; border-radius:24px; background:var(--cream); color:var(--ink); box-shadow:0 25px 90px #0008; animation:pop .25s ease; }
     .q-top { display:flex;justify-content:space-between;align-items:center;gap:12px; }
     .q-badge { color:#285346;background:#dff5bc;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700; }
     .q-count { color:#778c80;font-size:12px; }
@@ -50,8 +50,8 @@
     .answer.wrong { border-color:#e68f83;background:#fff0ec; }
     .feedback { min-height:25px;margin:10px 0 0;font-size:13px;font-weight:600;color:#a34c3f; }
     .feedback.good { color:#347b4b; }
-    .q-next { display:none;margin-top:5px;border:0;border-radius:12px;background:var(--lime);padding:10px 18px;color:var(--ink);font:700 14px Mali,sans-serif;cursor:pointer; }
-    .q-next.show { display:inline-block; }
+    .q-next { position:sticky;bottom:0;z-index:2;display:none;width:100%;min-height:54px;margin-top:8px;border:0;border-radius:12px;background:var(--lime);padding:12px 18px;color:var(--ink);font:700 15px Mali,sans-serif;cursor:pointer;touch-action:manipulation;box-shadow:0 -5px 14px #fff9e9; }
+    .q-next.show { display:block; }
     .finish-card { text-align:center;width:min(480px,100%);padding:30px;border-radius:25px;background:var(--cream);color:var(--ink);box-shadow:0 25px 90px #0008; }
     .finish-card .big { font-size:54px; }
     .finish-card h2 { margin:0 0 8px; }
@@ -71,10 +71,28 @@
       .answer { min-height:46px; }
       .stat { font-size:11px;padding:6px 9px; }
     }
+    .rotate-prompt { position:fixed;z-index:99;inset:0;display:none;place-items:center;padding:28px;background:#102832;color:var(--cream);text-align:center; }
+    .rotate-prompt strong { display:block;font-size:clamp(22px,5vw,32px); }
+    .rotate-prompt span { display:block;font-size:58px;margin-bottom:10px; }
+    .rotate-prompt p { color:#cfe1d8;margin:8px 0 0; }
+    @media (orientation:portrait) and (pointer:coarse) { .rotate-prompt { display:grid; } }
+    @media (orientation:landscape) and (pointer:coarse) {
+      body { width:100%;height:100svh;min-height:0;overflow:hidden; }
+      main { width:100%;height:100svh;min-height:0;padding:0;align-items:center;justify-content:center; }
+      header { position:fixed;z-index:5;top:calc(5px + env(safe-area-inset-top));right:10px;margin:0; }
+      .brand { display:none; }
+      .hud { position:fixed;z-index:5;top:calc(6px + env(safe-area-inset-top));left:10px;right:10px;margin:0;align-items:flex-start;pointer-events:none; }
+      .hud .stats { pointer-events:auto; }
+      .game-frame { flex:none;width:min(100vw,177.78svh);height:min(100svh,56.25vw);border-radius:10px; }
+      canvas { width:100%;height:100%;aspect-ratio:auto; }
+      .hintbar,.credit { display:none; }
+      .touch-controls { padding:0 3.2% calc(3.2% + env(safe-area-inset-bottom)); }
+    }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important; } }
   </style>
 </head>
 <body>
+  <div class="rotate-prompt" role="status"><div><span aria-hidden="true">📱↻</span><strong>หมุนอุปกรณ์เป็นแนวนอน</strong><p>เกมนี้ออกแบบมาให้เล่นในแนวนอน</p></div></div>
   <main>
     <header>
       <div class="brand"><span class="mark">🧬</span><span>GENETICS QUEST<small>คำศัพท์พันธุศาสตร์ ม.4</small></span></div>
@@ -208,8 +226,8 @@
     });
     document.addEventListener('selectstart',e=>e.preventDefault());
     document.addEventListener('contextmenu',e=>{if(e.target.closest('.game-frame,.overlay,.touch-controls'))e.preventDefault();});
-    unction openQuestion(index){paused=true;pending=index;hintBought=false;const hintBtn=document.getElementById('buyHint');hintBtn.disabled=false;hintBtn.textContent='🪙 ซื้อคำใบ้ · 3 เหรียญ';document.getElementById('hintText').textContent='';const q=questions[index];document.getElementById('qStage').textContent=`ด่าน ${stageNum} · คำศัพท์`;document.getElementById('qCount').textContent=`ไอเทม ${index+1} / 10`;document.getElementById('questionText').textContent=q.q;const box=document.getElementById('answers');box.replaceChildren();const feedback=document.getElementById('feedback');feedback.textContent='';feedback.className='feedback';document.getElementById('continueBtn').classList.remove('show');const order=q.c.map((text,originalIndex)=>({text,originalIndex}));for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}order.forEach((item,position)=>{const b=document.createElement('button');b.className='answer';b.textContent=`${'กขคง'[position]}. ${item.text}`;b.addEventListener('click',()=>answer(item.originalIndex,b));box.appendChild(b);});qOverlay.classList.add('open');box.querySelector('button')?.focus();}
-    function answer(index,button){const q=questions[pending],feedback=document.getElementById('feedback');if(index===q.a){correctQuestions.add(pending);button.classList.add('correct');document.querySelectorAll('.answer').forEach(b=>b.disabled=true);feedback.textContent=`ถูกต้อง! ${q.e}`;feedback.className='feedback good';document.getElementById('continueBtn').classList.add('show');}else{wrongAnswers++;button.classList.add('wrong');button.disabled=true;feedback.textContent='ยังไม่ใช่ ลองเลือกอีกคำตอบนะ';feedback.className='feedback';}}
+    function openQuestion(index){paused=true;pending=index;hintBought=false;const hintBtn=document.getElementById('buyHint');hintBtn.disabled=false;hintBtn.textContent='🪙 ซื้อคำใบ้ · 3 เหรียญ';document.getElementById('hintText').textContent='';const q=questions[index];document.getElementById('qStage').textContent=`ด่าน ${stageNum} · คำศัพท์`;document.getElementById('qCount').textContent=`ไอเทม ${index+1} / 10`;document.getElementById('questionText').textContent=q.q;const box=document.getElementById('answers');box.replaceChildren();const feedback=document.getElementById('feedback');feedback.textContent='';feedback.className='feedback';document.getElementById('continueBtn').classList.remove('show');const order=q.c.map((text,originalIndex)=>({text,originalIndex}));for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}order.forEach((item,position)=>{const b=document.createElement('button');b.className='answer';b.textContent=`${'กขคง'[position]}. ${item.text}`;b.addEventListener('click',()=>answer(item.originalIndex,b));box.appendChild(b);});qOverlay.classList.add('open');box.querySelector('button')?.focus();}
+    function answer(index,button){const q=questions[pending],feedback=document.getElementById('feedback');if(index===q.a){correctQuestions.add(pending);button.classList.add('correct');document.querySelectorAll('.answer').forEach(b=>b.disabled=true);feedback.textContent=`ถูกต้อง! ${q.e}`;feedback.className='feedback good';document.getElementById('continueBtn').classList.add('show');requestAnimationFrame(()=>document.getElementById('continueBtn').scrollIntoView({block:'nearest',behavior:'smooth'}));}else{wrongAnswers++;button.classList.add('wrong');button.disabled=true;feedback.textContent='ยังไม่ใช่ ลองเลือกอีกคำตอบนะ';feedback.className='feedback';}}
     document.getElementById('buyHint').addEventListener('click',()=>{const feedback=document.getElementById('feedback');if(hintBought)return;if(money<3){feedback.textContent='เหรียญยังไม่พอ ยิงมอนสเตอร์เพื่อสะสมเหรียญนะ';feedback.className='feedback';return;}money-=3;updateMoney();hintBought=true;document.getElementById('buyHint').disabled=true;document.getElementById('buyHint').textContent='ซื้อคำใบ้แล้ว ✓';document.getElementById('hintText').textContent=`คำใบ้: ${hintBank[stage][pending]}`;});
     function showStageSummary(completed){const result={stage:stageNum,title:info.title,playerName,completed,correct:correctQuestions.size,wrong:wrongAnswers,items:collected,total:10,coins:coinsEarned,hearts};localStorage.setItem('geneticsLastStageResult',JSON.stringify(result));location.href=`summary.html?stage=${stageNum}`;}
     document.getElementById('continueBtn').addEventListener('click',()=>{items[pending].got=true;collected++;count.textContent=`${collected} / 10`;player.checkpoint=player.x;player.checkpointY=platformAt(player.x+player.w/2).y-player.h;qOverlay.classList.remove('open');paused=false;if(collected===10){finished=true;showStageSummary(true);}});
