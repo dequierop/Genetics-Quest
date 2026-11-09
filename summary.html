@@ -23,6 +23,7 @@
         <div class="stat"><span>ตอบผิด</span><strong id="wrong">0 ครั้ง</strong></div>
         <div class="stat"><span>เหรียญที่ได้จากมอนสเตอร์</span><strong id="coins">🪙 0</strong></div>
         <div class="stat"><span>หัวใจที่เหลือ</span><strong id="hearts">❤️❤️❤️</strong></div>
+        <div class="stat"><span>เกราะกันตกที่เหลือ</span><strong id="shields">🪽 0</strong></div>
       </div>
       <div class="progress"><i id="bar"></i></div>
       <div class="progress-label" id="progressLabel">เก็บไอเทม 0 / 10</div>
@@ -33,7 +34,7 @@
   <script>
     const level=Math.min(3,Math.max(1,Number(new URLSearchParams(location.search).get('stage'))||1));
     let result;try{result=JSON.parse(localStorage.getItem('geneticsLastStageResult')||'null')}catch{}
-    if(!result||result.stage!==level)result={stage:level,title:`ด่าน ${level}`,playerName:localStorage.getItem('playerName')||'นักสำรวจ',completed:false,correct:0,wrong:0,items:0,total:10,coins:0,hearts:3};
+    if(!result||result.stage!==level)result={stage:level,title:`ด่าน ${level}`,playerName:localStorage.getItem('playerName')||'นักสำรวจ',completed:false,correct:0,wrong:0,items:0,total:10,coins:0,hearts:3,maxHearts:3,shields:0};
     document.title=`สรุปผล${result.title} — Genetics Quest`;
     document.getElementById('stage').textContent=result.title;
     document.getElementById('icon').textContent=result.completed?'🏆':'💔';
@@ -42,7 +43,8 @@
     document.getElementById('correct').textContent=`${result.correct} / 10`;
     document.getElementById('wrong').textContent=`${result.wrong} ครั้ง`;
     document.getElementById('coins').textContent=`🪙 ${result.coins}`;
-    document.getElementById('hearts').textContent='❤️'.repeat(result.hearts)+'♡'.repeat(3-result.hearts);
+    document.getElementById('hearts').textContent='❤️'.repeat(result.hearts)+'♡'.repeat((result.maxHearts||3)-result.hearts);
+    document.getElementById('shields').textContent=`🪽 ${result.shields||0}`;
     document.getElementById('bar').style.width=`${Math.min(100,result.items*10)}%`;
     document.getElementById('progressLabel').textContent=`เก็บไอเทม ${result.items} / ${result.total}`;
     const actions=document.getElementById('actions');
